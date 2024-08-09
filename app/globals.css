@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  input,
+  textarea {
+    @apply border border-black;
+  }
+}
+
 /*
 
 :root {
