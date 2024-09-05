@@ -5,10 +5,12 @@ import Link from "next/link";
 export default async function Home({
   searchParams,
 }: {
-  searchParams: { limit?: number };
+  searchParams: { limit?: number; search?: string };
 }) {
   const limit = Number(searchParams.limit) || 10;
-  const { items, nextHref } = await getItems(limit);
+  const { items, nextHref } = await getItems(limit, {
+    search: searchParams.search,
+  });
   return (
     <main>
       <h2></h2>

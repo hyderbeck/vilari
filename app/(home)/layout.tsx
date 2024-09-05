@@ -1,5 +1,6 @@
-import Preview from "@/components/preview";
+// import Preview from "@/components/preview";
 import Link from "next/link";
+import Search from "@/components/search";
 
 export default function HomeLayout({
   children,
@@ -12,11 +13,10 @@ export default function HomeLayout({
         <h1 className="text-3xl">
           <Link href="/">Villari</Link>
         </h1>
-        <button>search</button>
-        <input type="search" />
+        <Search />
         <button>bag</button>
         <section className="flex items-center">
-          <Preview />
+          {/*<Preview />*/}
           <p>empty</p>
           <Link href="/checkout">checkout</Link>
         </section>
