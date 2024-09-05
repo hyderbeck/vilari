@@ -16,3 +16,7 @@ export interface ItemPosition extends Item {
   price: number;
   quantity: number;
 }
+
+export interface ItemTypes {
+  [key: string]: { id: string; name: string }[];
+}

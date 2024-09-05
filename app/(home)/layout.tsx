@@ -1,8 +1,10 @@
 // import Preview from "@/components/preview";
 import Link from "next/link";
 import Search from "@/components/search";
+import { getItemTypes } from "@/queries";
+import Nav from "@/components/nav";
 
-export default function HomeLayout({
+export default async function HomeLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -20,12 +22,7 @@ export default function HomeLayout({
           <p>empty</p>
           <Link href="/checkout">checkout</Link>
         </section>
-        <button>navbar</button>
-        <nav>
-          <ul>
-            <li></li>
-          </ul>
-        </nav>
+        <Nav itemTypes={await getItemTypes()} />
       </header>
       {children}
     </>

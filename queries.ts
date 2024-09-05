@@ -1,4 +1,4 @@
-import { ItemPage, ItemPreview } from "./interfaces";
+import { ItemPage, ItemPreview, ItemTypes } from "./interfaces";
 
 export async function fetchData(endpoint: string, body?: Object) {
   const auth =
@@ -24,7 +24,7 @@ export async function getItems(
 ) {
   let endpoint = `product?limit=${limit}`;
   if (params?.search) endpoint += `&search=${params?.search}`;
-  if (params?.filter) endpoint += `&filter=pathName=${params?.filter}`;
+  if (params?.filter) endpoint += `&filter=${params?.filter}`;
   const data = await fetchData(endpoint);
   return {
     items: data.rows.map(
@@ -60,7 +60,7 @@ export async function getItem(id: string) {
 }
 
 export async function getItemTypes() {
-  const itemTypes: { [key: string]: { id: string; name: string }[] } = {};
+  const itemTypes: ItemTypes = {};
   (await fetchData("productfolder")).rows.forEach(
     (itemType: { id: string; pathName: string; name: string }) => {
       const pathName = itemType.pathName;
