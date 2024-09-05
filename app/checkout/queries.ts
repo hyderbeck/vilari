@@ -12,7 +12,7 @@ async function getCustomer(name: string, phone: string) {
   ).id as string;
 }
 
-async function createOrder(customerId: string, cart: ItemPosition[]) {
+async function createOrder(customerId: string, bag: ItemPosition[]) {
   return await fetchData("customerorder", {
     organization: {
       meta: {
@@ -26,7 +26,7 @@ async function createOrder(customerId: string, cart: ItemPosition[]) {
         type: "counterparty",
       },
     },
-    positions: cart.map(({ id, price, quantity }) => {
+    positions: bag.map(({ id, price, quantity }) => {
       return {
         assortment: {
           meta: {
@@ -43,8 +43,8 @@ async function createOrder(customerId: string, cart: ItemPosition[]) {
 
 export async function placeOrder(
   customer: { name: string; phone: string },
-  cart: { id: string; quantity: number; price: number }[]
+  bag: { id: string; quantity: number; price: number }[]
 ) {
   const customerId = await getCustomer(customer.name, customer.phone);
-  await createOrder(customerId, cart);
+  await createOrder(customerId, bag);
 }

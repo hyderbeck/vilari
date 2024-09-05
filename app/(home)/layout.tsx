@@ -1,8 +1,8 @@
-// import Preview from "@/components/preview";
 import Link from "next/link";
 import Search from "@/components/search";
 import { getItemTypes } from "@/queries";
 import Nav from "@/components/nav";
+import Bag from "@/components/bag";
 
 export default async function HomeLayout({
   children,
@@ -16,12 +16,7 @@ export default async function HomeLayout({
           <Link href="/">Villari</Link>
         </h1>
         <Search />
-        <button>bag</button>
-        <section className="flex items-center">
-          {/*<Preview />*/}
-          <p>empty</p>
-          <Link href="/checkout">checkout</Link>
-        </section>
+        <Bag />
         <Nav itemTypes={await getItemTypes()} />
       </header>
       {children}

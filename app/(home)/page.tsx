@@ -18,7 +18,7 @@ export default async function Home({
       <p></p>
       <section>
         {items.map((item) => (
-          <Preview key={item.id} name={item.name} />
+          <Preview key={item.id} item={item} />
         ))}
       </section>
       {nextHref && (
