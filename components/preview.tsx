@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useItems } from "./bag";
 import { ItemPreview } from "@/interfaces";
 
@@ -11,7 +12,9 @@ export default function Preview({ item }: { item: ItemPreview }) {
   return (
     <article className="flex">
       <img alt="" />
-      <h3>{name}</h3>
+      <Link href={`/${id}`}>
+        <h3>{name}</h3>
+      </Link>
       <p>{code}</p>
       <p>{`${price / 100} RUB`}</p>
       <button
