@@ -9,14 +9,36 @@ export function getBag() {
   return JSON.parse(localStorage.getItem("bag") || "[]") as ItemPreview[];
 }
 
-export default function Bag() {
-  const [bag, setBag] = useState(false);
+export function useItems() {
   const [items, setItems] = useState([] as ItemPreview[]);
 
   useEffect(() => {
     setItems(getBag());
     window.addEventListener("bag", () => setItems(getBag()));
   }, []);
+
+  return items;
+}
+
+export function Bag({ onClick }: { onClick?: () => void }) {
+  const items = useItems();
+
+  return (
+    <section
+      className={onClick && "absolute top-0 right-0 bottom-0 left-0 bg-white"}
+    >
+      {onClick && <button onClick={onClick}>x</button>}
+      {items.length ? (
+        items.map((item) => <Preview key={item.id} item={item} />)
+      ) : (
+        <p>empty</p>
+      )}
+    </section>
+  );
+}
+
+export default function BagHeader() {
+  const [bag, setBag] = useState(false);
 
   return (
     <>
@@ -27,23 +49,8 @@ export default function Bag() {
       >
         bag
       </button>
-      {bag && (
-        <section className="absolute top-0 right-0 bottom-0 left-0 bg-white">
-          <button
-            onClick={() => {
-              setBag(false);
-            }}
-          >
-            x
-          </button>
-          {items.length ? (
-            items.map((item) => <Preview key={item.id} item={item} />)
-          ) : (
-            <p>empty</p>
-          )}
-          <Link href="/checkout">checkout</Link>
-        </section>
-      )}
+      {bag && <Bag onClick={() => setBag(false)} />}
+      <Link href="/checkout">checkout</Link>
     </>
   );
 }

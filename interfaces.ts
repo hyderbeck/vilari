@@ -1,10 +1,10 @@
 export interface Item {
   id: string;
+  price: number;
 }
 
 export interface ItemPreview extends Item {
   name: string;
-  price: string;
   code: string;
 }
 
@@ -13,7 +13,6 @@ export interface ItemPage extends ItemPreview {
 }
 
 export interface ItemPosition extends Item {
-  price: number;
   quantity: number;
 }
 

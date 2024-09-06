@@ -1,4 +1,4 @@
-import { ItemPage, ItemPreview, ItemTypes } from "./interfaces";
+import { ItemPage, ItemPosition, ItemPreview, ItemTypes } from "./interfaces";
 
 export async function fetchData(endpoint: string, body?: Object) {
   const auth =
@@ -39,7 +39,7 @@ export async function getItems(
           id: item.id,
           name: item.name,
           code: `${item.externalCode}, ${item.code}`,
-          price: `${item.salePrices[0].value / 100} RUB`,
+          price: item.salePrices[0].value,
         };
       }
     ) as ItemPreview[],
@@ -55,7 +55,7 @@ export async function getItem(id: string) {
     name: item.name,
     code: `${item.externalCode}, ${item.code}`,
     itemType: item.pathName,
-    price: `${item.salePrices[0].value / 100} RUB`,
+    price: item.salePrices[0].value,
   } as ItemPage;
 }
 
@@ -70,4 +70,49 @@ export async function getItemTypes() {
     }
   );
   return itemTypes;
+}
+
+export async function getCustomer(name: string, phone: string) {
+  let customer = (
+    await fetchData(`counterparty?filter=phone~${phone.slice(2)}`)
+  ).rows;
+  if (customer.length) return customer[0].id as string;
+
+  return (
+    await fetchData("counterparty", { name, phone, companyType: "individual" })
+  ).id as string;
+}
+
+export async function createOrder(
+  customerId: string,
+  bag: ItemPosition[],
+  description: string
+) {
+  return await fetchData("customerorder", {
+    organization: {
+      meta: {
+        href: `https://api.moysklad.ru/api/remap/1.2/entity/organization/${process.env.ACCOUNT_ID}`,
+        type: "organization",
+      },
+    },
+    agent: {
+      meta: {
+        href: `https://api.moysklad.ru/api/remap/1.2/entity/counterparty/${customerId}`,
+        type: "counterparty",
+      },
+    },
+    positions: bag.map(({ id, price, quantity }) => {
+      return {
+        assortment: {
+          meta: {
+            href: `https://api.moysklad.ru/api/remap/1.2/entity/product/${id}`,
+            type: "product",
+          },
+        },
+        price,
+        quantity,
+      };
+    }),
+    description,
+  });
 }
