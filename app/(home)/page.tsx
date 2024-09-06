@@ -1,6 +1,7 @@
 import Preview from "@/components/preview";
 import { getItems } from "@/queries";
 import Link from "next/link";
+import { Suspense } from "react";
 
 export default async function Home({
   searchParams,
@@ -16,11 +17,13 @@ export default async function Home({
     <main>
       <h2></h2>
       <p></p>
-      <section>
-        {items.map((item) => (
-          <Preview key={item.id} item={item} />
-        ))}
-      </section>
+      <Suspense fallback="...">
+        <section>
+          {items.map((item) => (
+            <Preview key={item.id} item={item} />
+          ))}
+        </section>
+      </Suspense>
       {nextHref && (
         <Link href={`?limit=${limit + 10}`} scroll={false}>
           Load more
