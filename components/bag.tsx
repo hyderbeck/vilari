@@ -24,12 +24,12 @@ export function Bag({ onClick }: { onClick?: () => void }) {
   const items = useItems();
 
   return (
-    <section
-      className={onClick && "absolute top-0 right-0 bottom-0 left-0 bg-white"}
-    >
+    <section>
       {onClick && <button onClick={onClick}>x</button>}
       {items.length ? (
-        items.map((item) => <Preview key={item.id} item={item} />)
+        items.map((item) => (
+          <Preview key={item.id} item={item} onClick={onClick} />
+        ))
       ) : (
         <p>empty</p>
       )}
@@ -49,8 +49,12 @@ export default function BagHeader() {
       >
         bag
       </button>
-      {bag && <Bag onClick={() => setBag(false)} />}
-      <Link href="/checkout">checkout</Link>
+      {bag && (
+        <section className="absolute top-0 right-0 bottom-0 left-0 bg-white">
+          <Bag onClick={() => setBag(false)} />
+          <Link href="/checkout">checkout</Link>
+        </section>
+      )}
     </>
   );
 }

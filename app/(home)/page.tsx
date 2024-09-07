@@ -19,9 +19,9 @@ export default async function Home({
       <p></p>
       <Suspense fallback="...">
         <section>
-          {items.map((item) => (
-            <Preview key={item.id} item={item} />
-          ))}
+          {items.length
+            ? items.map((item) => <Preview key={item.id} item={item} />)
+            : "not found"}
         </section>
       </Suspense>
       {nextHref && (

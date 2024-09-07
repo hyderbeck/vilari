@@ -1,4 +1,4 @@
-import { ItemPage, ItemPosition, ItemPreview, ItemTypes } from "./interfaces";
+import { Item, ItemPreview, ItemTypes } from "./interfaces";
 
 export async function fetchData(endpoint: string, body?: Object) {
   const auth =
@@ -18,6 +18,22 @@ export async function fetchData(endpoint: string, body?: Object) {
   ).json();
 }
 
+async function getImageHref(id: string) {
+  const images = (await fetchData(`product/${id}/images`)).rows;
+  if (!images || !images.length) return;
+  const rowIndex = (images as []).findIndex(
+    (row: { miniature?: {} }) => row.miniature
+  );
+  if (rowIndex < 0) return;
+  return images[rowIndex].miniature.downloadHref;
+}
+
+async function getItemStock(code: string) {
+  const data = (await fetchData(`assortment?filter=article=${code}`)).rows;
+  if (!data || !data.length) return;
+  return data[0].stock as number;
+}
+
 export async function getItems(
   limit: number,
   params?: { search?: string; filter?: string }
@@ -26,9 +42,9 @@ export async function getItems(
   if (params?.search) endpoint += `&search=${params?.search}`;
   if (params?.filter) endpoint += `&filter=${params?.filter}`;
   const data = await fetchData(endpoint);
-  return {
-    items: data.rows.map(
-      (item: {
+  const items = await Promise.all(
+    data.rows.map(
+      async (item: {
         id: string;
         name: string;
         code: string;
@@ -40,9 +56,18 @@ export async function getItems(
           name: item.name,
           code: `${item.externalCode}, ${item.code}`,
           price: item.salePrices[0].value,
+          imageHref: await getImageHref(item.id),
+          stock: await getItemStock(item.externalCode),
+          quantity: 0,
         };
       }
-    ) as ItemPreview[],
+    ) as ItemPreview[]
+  );
+
+  return {
+    items: items.filter(
+      (item) => item.imageHref && typeof item.stock !== "undefined"
+    ),
     nextHref: !!data.meta.nextHref,
   };
 }
@@ -50,13 +75,20 @@ export async function getItems(
 export async function getItem(id: string) {
   const item = await fetchData(`product/${id}`);
   if ("errors" in item) return;
+  const imageHref = await getImageHref(item.id);
+  if (!imageHref) return;
+  const stock = await getItemStock(item.externalCode);
+  if (typeof stock === "undefined") return;
   return {
     id,
     name: item.name,
     code: `${item.externalCode}, ${item.code}`,
     itemType: item.pathName,
     price: item.salePrices[0].value,
-  } as ItemPage;
+    imageHref,
+    stock,
+    quantity: 0,
+  } as ItemPreview;
 }
 
 export async function getItemTypes() {
@@ -85,7 +117,7 @@ export async function getCustomer(name: string, phone: string) {
 
 export async function createOrder(
   customerId: string,
-  bag: ItemPosition[],
+  bag: Item[],
   description: string
 ) {
   return await fetchData("customerorder", {

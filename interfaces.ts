@@ -1,19 +1,15 @@
 export interface Item {
   id: string;
   price: number;
+  quantity: number;
 }
 
 export interface ItemPreview extends Item {
   name: string;
   code: string;
-}
-
-export interface ItemPage extends ItemPreview {
+  imageHref: string;
   itemType: string;
-}
-
-export interface ItemPosition extends Item {
-  quantity: number;
+  stock: number;
 }
 
 export interface ItemTypes {
