@@ -15,8 +15,12 @@ export default function Preview({
   const { id, name, price, code, imageHref } = item;
 
   return (
-    <article className="flex">
-      <img alt="" src={imageHref} />
+    <article className="flex flex-col justify-between items-center bg-white p-6">
+      <img
+        alt=""
+        src={"https://placehold.co/400/white/white" /* imageHref */}
+        className="w-[200px] aspect-square"
+      />
       <Link href={`/${id}`} onClick={onClick}>
         <h3>{name}</h3>
       </Link>

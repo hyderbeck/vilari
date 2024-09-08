@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import Footer from "@/components/footer";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({
+  subsets: ["latin", "cyrillic"],
+});
 
 export const metadata: Metadata = {
   title: "Villari",
@@ -16,11 +19,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.className} flex flex-col items-center p-2`}>
+      <body
+        className={`${inter.className} text-sm tracking-wide flex flex-col justify-between min-h-screen`}
+      >
         {children}
-        <footer>
-          <address className="not-italic">contact us</address>
-        </footer>
+        <Footer />
       </body>
     </html>
   );

@@ -14,21 +14,23 @@ export default async function Home({
     filter: searchParams.filter,
   });
   return (
-    <main>
+    <main className="flex flex-col items-center justify-center">
       <h2></h2>
       <p></p>
       <Suspense fallback="...">
-        <section>
-          {items.length
-            ? items.map((item) => <Preview key={item.id} item={item} />)
-            : "not found"}
+        <section className="bg-white px-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-8">
+            {items.length
+              ? items.map((item) => <Preview key={item.id} item={item} />)
+              : "not found"}
+          </div>
+          {nextHref && (
+            <Link href={`?limit=${limit + 10}`} scroll={false}>
+              Load more
+            </Link>
+          )}
         </section>
       </Suspense>
-      {nextHref && (
-        <Link href={`?limit=${limit + 10}`} scroll={false}>
-          Load more
-        </Link>
-      )}
     </main>
   );
 }

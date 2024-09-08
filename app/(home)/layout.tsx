@@ -11,7 +11,7 @@ export default async function HomeLayout({
 }>) {
   return (
     <>
-      <header className="flex">
+      <header className="flex bg-white">
         <h1 className="text-3xl">
           <Link href="/">Villari</Link>
         </h1>
