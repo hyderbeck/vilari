@@ -31,7 +31,7 @@ export default function Add({ item }: { item: ItemPreview }) {
   const i = items.findIndex(({ id }) => id === item.id);
   const quantity = i >= 0 ? items[i].quantity : 0;
   const className =
-    "text-xs flex gap-x-3 items-center p-2 h-10 text-white font-base bg-black rounded";
+    "text-xs flex gap-x-3 items-center p-2 h-10 text-white font-base bg-black rounded w-28";
 
   return quantity ? (
     <section className={`${className} justify-between`}>

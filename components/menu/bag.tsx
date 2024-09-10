@@ -35,7 +35,7 @@ export default function Bag({
           className={
             `absolute right-0 ${
               bag ? "hidden md:flex" : "hidden"
-            } flex-col pt-16 w-full max-w-md max-h-[480px] shadow -z-10 bg-white` /* hidden below search div */
+            } flex-col pt-14 w-full max-w-md max-h-[480px] shadow -z-10 bg-white` /* hidden below search div */
           }
         />
       )}

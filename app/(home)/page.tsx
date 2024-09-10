@@ -14,19 +14,24 @@ export default async function Home({
     filter: searchParams.filter,
   });
   return (
-    <main className="flex flex-col items-center justify-center">
-      <h2></h2>
-      <p></p>
-      <Suspense fallback="...">
-        <section className="px-6">
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-8">
+    <main className="px-6 pt-32 flex-1 flex justify-center items-center">
+      <Suspense fallback={<p className="text-base font-normal">. . .</p>}>
+        <section className="flex flex-col items-center justify-center gap-y-6 w-full">
+          <div className="grid grid-cols-1 gap-8 w-full max-w-screen-lg 2xl:ml-12">
             {items.length
-              ? items.map((item) => <Preview key={item.id} item={item} />)
+              ? items.map((item) => (
+                  <Preview key={item.id} item={item} page="home" />
+                ))
               : "not found"}
           </div>
           {nextHref && (
-            <Link href={`?limit=${limit + 10}`} scroll={false}>
-              Load more
+            <Link
+              replace
+              href={`?limit=${limit + 10}`}
+              scroll={false}
+              className="py-2 text-center bg-black text-white rounded font-normal w-28 2xl:ml-12"
+            >
+              Больше
             </Link>
           )}
         </section>

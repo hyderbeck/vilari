@@ -1,32 +1,41 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import Link from "next/link";
 import { ItemPreview } from "@/interfaces";
 import Add from "./buttons/add";
 
 export default function Preview({
   item,
-  onClick,
+  page,
 }: {
   item: ItemPreview;
-  onClick?: () => void;
+  page?: "home" | "checkout";
 }) {
-  const { id, name, price, code, imageHref } = item;
+  const { name, price, code, imageHref, quantity } = item;
 
   return (
-    <article className="flex flex-col justify-between items-center bg-white p-6">
-      <img
-        alt=""
-        src={"https://placehold.co/400/white/white" /* imageHref */}
-        className="w-[200px] aspect-square"
-      />
-      <Link href={`/${id}`} onClick={onClick}>
-        <h3>Private Decor Collection</h3>
-      </Link>
-      <p>{code}</p>
-      <p>{`${price / 100} RUB`}</p>
-      <Add item={item} />
+    <article
+      className={
+        page === "home"
+          ? "flex justify-between gap-x-6 h-[100px]"
+          : "flex justify-between gap-x-6 h-[100px]"
+      }
+    >
+      <img alt="item" src={imageHref} className="w-[100px] aspect-square" />
+      <p
+        className={
+          page
+            ? "overflow-hidden w-[90px] xs:w-[210px] 2xl:w-[350px] mr-auto"
+            : "overflow-hidden w-[125px] mr-auto"
+        }
+      >
+        {name}
+      </p>
+      {page === "home" && <p className="mr-auto hidden md:block">{code}</p>}
+      <div className="flex flex-col justify-between items-end">
+        {page ? <Add item={item} /> : <p className="text-xs">{quantity}x</p>}
+        <p className="text-base">{price / 100} RUB</p>
+      </div>
     </article>
   );
 }

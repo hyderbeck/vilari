@@ -3,7 +3,7 @@
 import { ItemPreview } from "@/interfaces";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import Add from "./buttons/add";
+import Preview from "./preview";
 
 export function getBag() {
   return JSON.parse(localStorage.getItem("bag") || "[]") as ItemPreview[];
@@ -39,30 +39,11 @@ export default function Bag({
             }`}
           >
             {items.map((item) => (
-              <article className="flex justify-between gap-x-6 h-[100px]">
-                <img
-                  alt="item"
-                  src={item.imageHref}
-                  className="w-[100px] aspect-square"
-                />
-                <p
-                  className={`overflow-hidden ${
-                    checkout
-                      ? "w-[90px] xs:w-[210px] 2xl:w-[350px]"
-                      : "w-[150px]"
-                  } mr-auto`}
-                >
-                  {item.name}
-                </p>
-                <div className="flex flex-col justify-between items-end">
-                  {checkout ? (
-                    <Add item={item} />
-                  ) : (
-                    <p className="text-xs">{item.quantity}x</p>
-                  )}
-                  <p className="text-base">{item.price / 100} RUB</p>
-                </div>
-              </article>
+              <Preview
+                key={item.id}
+                item={item}
+                page={checkout ? "checkout" : undefined}
+              />
             ))}
           </div>
           <footer

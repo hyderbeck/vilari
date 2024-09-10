@@ -24,7 +24,7 @@ export default function Nav({
       <nav
         className={`fixed md:absolute top-0 md:top-auto right-0 bottom-0 md:bottom-auto left-0 md:left-auto ${
           nav ? "" : "hidden"
-        } pt-[88px] md:pt-16 w-full md:max-w-xs md:-z-10 md:overflow-scroll bg-white md:shadow nav`}
+        } pt-[88px] md:pt-14 w-full md:max-w-xs md:-z-10 md:overflow-scroll bg-white md:shadow nav`}
       >
         <div
           className={`flex flex-col items-center p-6 border-t md:border-none overflow-scroll md:overflow-auto max-h-full`}
@@ -38,7 +38,7 @@ export default function Nav({
             </button>
           ) : (
             <Link
-            replace
+              replace
               href="/"
               className={`${className} mb-3`}
               onClick={() => {
@@ -52,7 +52,7 @@ export default function Nav({
           {group ? (
             itemTypes[group].map((itemType) => (
               <Link
-              replace
+                replace
                 key={itemType.id}
                 href={"?filter=pathName=" + group + "/" + itemType.name}
                 onClick={() => {
