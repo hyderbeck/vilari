@@ -38,6 +38,7 @@ export default function Nav({
             </button>
           ) : (
             <Link
+            replace
               href="/"
               className={`${className} mb-3`}
               onClick={() => {
@@ -51,6 +52,7 @@ export default function Nav({
           {group ? (
             itemTypes[group].map((itemType) => (
               <Link
+              replace
                 key={itemType.id}
                 href={"?filter=pathName=" + group + "/" + itemType.name}
                 onClick={() => {

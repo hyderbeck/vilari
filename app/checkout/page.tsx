@@ -44,8 +44,7 @@ export async function placeOrder(
 
 export default function Checkout() {
   return (
-    <main>
-      <h2></h2>
+    <main className="flex flex-col items-center lg:items-start justify-center lg:flex-row gap-12 2xl:gap-x-24 mt-32 mx-6 2xl:mx-12">
       <Form placeOrderAction={placeOrder} />
     </main>
   );

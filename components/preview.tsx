@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { ItemPreview } from "@/interfaces";
-import Add from "./add";
+import Add from "./buttons/add";
 
 export default function Preview({
   item,
