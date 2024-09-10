@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Header from "@/components/header";
 
 export default function CheckoutLayout({
   children,
@@ -7,11 +7,7 @@ export default function CheckoutLayout({
 }>) {
   return (
     <>
-      <header className="flex">
-        <h1 className="text-3xl">
-          <Link href="/">Villari</Link>
-        </h1>
-      </header>
+      <Header />
       {children}
     </>
   );

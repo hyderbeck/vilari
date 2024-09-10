@@ -22,7 +22,7 @@ export default function Preview({
         className="w-[200px] aspect-square"
       />
       <Link href={`/${id}`} onClick={onClick}>
-        <h3>{name}</h3>
+        <h3>Private Decor Collection</h3>
       </Link>
       <p>{code}</p>
       <p>{`${price / 100} RUB`}</p>

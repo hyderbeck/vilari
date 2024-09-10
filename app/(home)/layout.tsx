@@ -1,8 +1,4 @@
-import Link from "next/link";
-import Search from "@/components/search";
-import { getItemTypes } from "@/queries";
-import Nav from "@/components/nav";
-import Bag from "@/components/bag";
+import Header from "@/components/header";
 
 export default async function HomeLayout({
   children,
@@ -11,14 +7,7 @@ export default async function HomeLayout({
 }>) {
   return (
     <>
-      <header className="flex bg-white">
-        <h1 className="text-3xl">
-          <Link href="/">Villari</Link>
-        </h1>
-        <Search />
-        <Bag />
-        <Nav itemTypes={await getItemTypes()} />
-      </header>
+      <Header menu />
       {children}
     </>
   );

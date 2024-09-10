@@ -2,10 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  input,
-  textarea {
-    @apply border border-black;
+@media (min-width: 768px) {
+  .nav {
+    max-height: calc(100vh - 100px);
   }
 }
 
