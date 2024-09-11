@@ -15,7 +15,7 @@ export default function Nav({
   itemTypes: ItemTypes;
 }) {
   const [group, setGroup] = useState("");
-  const className = "text-base hover:font-normal";
+  const className = "text-base xs:hover:font-normal";
   return (
     <>
       <button className="z-10" onClick={onClick}>

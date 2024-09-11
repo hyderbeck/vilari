@@ -7,7 +7,7 @@ export default function CheckoutLayout({
 }>) {
   return (
     <>
-      <Header />
+      <Header layout="checkout" />
       {children}
     </>
   );

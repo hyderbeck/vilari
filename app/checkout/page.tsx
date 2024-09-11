@@ -2,10 +2,7 @@ import Form from "@/components/form";
 import { ItemPreview } from "@/interfaces";
 import { createOrder, getCustomer } from "@/queries";
 
-export async function placeOrder(
-  _prevState: undefined | true,
-  formData: FormData
-) {
+async function placeOrder(_prevState: undefined | true, formData: FormData) {
   "use server";
 
   const customer = {
@@ -44,7 +41,7 @@ export async function placeOrder(
 
 export default function Checkout() {
   return (
-    <main className="flex flex-col items-center lg:items-start justify-center lg:flex-row gap-12 2xl:gap-x-24 mt-32 mx-6 mb-6 2xl:mx-12">
+    <main className="flex flex-col lg:flex-row items-center gap-12 2xl:gap-x-24 lg:px-6 2xl:px-12 pt-32">
       <Form placeOrderAction={placeOrder} />
     </main>
   );

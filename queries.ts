@@ -25,7 +25,7 @@ async function getImageHref(id: string) {
     (row: { miniature?: {} }) => row.miniature
   );
   if (rowIndex < 0) return;
-  return images[rowIndex].miniature.downloadHref;
+  return images[rowIndex].miniature.downloadHref as string;
 }
 
 async function getItemStock(code: string) {
@@ -123,7 +123,7 @@ export async function createOrder(
   return await fetchData("customerorder", {
     organization: {
       meta: {
-        href: `https://api.moysklad.ru/api/remap/1.2/entity/organization/${process.env.ACCOUNT_ID}`,
+        href: `https://api.moysklad.ru/api/remap/1.2/entity/organization/${process.env.ORGANIZATION}`,
         type: "organization",
       },
     },

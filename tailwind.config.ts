@@ -14,8 +14,7 @@ const config: Config = {
         xs: "480px",
       },
       backgroundImage: {
-        "vlr-pattern-white": "url('../public/vlr-white.svg')",
-        "vlr-pattern-green": "url('../public/vlr-green.svg')",
+        "vlr-ptrn": "url('../public/pattern.svg')",
       },
     },
   },

@@ -15,19 +15,19 @@ export default function Bag({
   return (
     <>
       <button
-        className="hidden md:flex gap-x-1 items-center z-10"
+        className="hidden md:flex items-center justify-between w-10 z-10"
         onClick={onClick}
       >
         <BagIcon />
-        {items.length}
+        {items.reduce((total, item) => total + item.quantity, 0)}
       </button>
       <Link
         href="/checkout"
-        className="flex md:hidden gap-x-1 items-center z-10"
+        className="flex md:hidden items-center justify-between w-10 z-10"
         onClick={() => (document.body.style.overflow = "auto")}
       >
         <BagIcon />
-        {items.length}
+        {items.reduce((total, item) => total + item.quantity, 0)}
       </Link>
       {bag && (
         <BagSection

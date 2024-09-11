@@ -1,7 +1,9 @@
 "use client";
 
 import Bag, { getBag, useItems } from "./bag";
+import { useEffect, useState } from "react";
 import { useFormState } from "react-dom";
+import Submit from "./buttons/submit";
 
 export default function Form({
   placeOrderAction,
@@ -11,25 +13,31 @@ export default function Form({
     formData: FormData
   ) => Promise<undefined | true>;
 }) {
+  const [mount, setMount] = useState(false);
+  const [clicked, setClicked] = useState(false);
   const [state, formAction] = useFormState(placeOrderAction, undefined);
   const items = useItems();
 
-  if (state) {
-    localStorage.setItem("bag", "[]");
-    window.dispatchEvent(new Event("bag"));
-  }
+  useEffect(() => {
+    setMount(true);
+    if (state) {
+      localStorage.setItem("bag", "[]");
+      window.dispatchEvent(new Event("bag"));
+      window.scrollTo(0, 0);
+    }
+  }, [state]);
 
   return state ? (
-    <p className="mx-auto">Заказ оформлен</p>
+    <p className="text-center w-full">Заказ оформлен</p>
   ) : items.length ? (
     <>
       <Bag
         items={items}
-        className="flex flex-col w-full max-w-screen-sm max-h-[50vh]"
+        className="flex flex-col w-full max-w-screen-sm max-h-[55vh] xs:max-h-[70vh] -mt-10"
         checkout
       />
       <form
-        className="flex flex-col gap-y-12 w-full max-w-screen-sm"
+        className="flex flex-col w-full max-w-screen-sm gap-y-9 mb-auto px-6 lg:px-0"
         id="form"
         action={formAction}
       >
@@ -37,32 +45,58 @@ export default function Form({
           type="text"
           name="name"
           aria-label="name"
+          autoComplete="on"
           required
           minLength={2}
           placeholder="Имя или название компании"
-          className="py-2 bg-inherit outline-none border-b rounded-none"
+          className="py-2 bg-inherit outline-none border-b rounded-none text-base xs:text-sm"
+          autoCorrect="false"
+          spellCheck="false"
+          onInvalid={(e) => {
+            const validity = e.currentTarget.validity;
+            if (validity.valueMissing || validity.tooShort) {
+              e.currentTarget.setCustomValidity("Заполните это поле");
+            } else {
+              e.currentTarget.setCustomValidity("");
+            }
+          }}
         />
         <input
           type="tel"
           name="phone"
           aria-label="phone"
+          autoComplete="on"
           required
           pattern="[0-9]{6,}"
-          title="six or more digits"
           placeholder="Телефон для связи"
-          className="py-2 bg-inherit outline-none border-b rounded-none"
+          className="py-2 bg-inherit outline-none border-b rounded-none text-base xs:text-sm"
+          autoCorrect="false"
+          spellCheck="false"
+          onInvalid={(e) => {
+            const validity = e.currentTarget.validity;
+            if (validity.patternMismatch) {
+              e.currentTarget.setCustomValidity("Введите номер телефона");
+            } else if (validity.valueMissing) {
+              e.currentTarget.setCustomValidity("Заполните это поле");
+            } else {
+              e.currentTarget.setCustomValidity("");
+            }
+          }}
         />
         <textarea
           name="description"
           aria-label="description"
           maxLength={300}
           placeholder="Пожелания к заказу"
-          className="px-4 py-2 bg-inherit outline-none border rounded resize-none"
+          className="px-4 py-2 bg-inherit outline-none border rounded resize-none text-base xs:text-sm"
           rows={5}
+          autoCorrect="false"
+          spellCheck="false"
         />
-        <button
-          type="submit"
+        <Submit
+          items={items}
           onClick={() => {
+            setClicked(clicked);
             const form = document.getElementById("form")!;
             const bag = document.createElement("input");
             bag.setAttribute("name", "bag");
@@ -70,14 +104,12 @@ export default function Form({
             bag.style.display = "none";
             form.appendChild(bag);
           }}
-          disabled={!items.length}
-          className="py-2 text-center bg-black text-white rounded font-normal"
-        >
-          Оформить
-        </button>
+        />
       </form>
     </>
+  ) : mount ? (
+    <p className="text-center w-full">В корзине пусто</p>
   ) : (
-    <p className="mx-auto">Пусто</p>
+    <p className="h-screen"></p>
   );
 }

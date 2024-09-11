@@ -1,13 +1,15 @@
 /* eslint-disable @next/next/no-img-element */
-import { getItem } from "@/queries";
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
-import Add from "@/components/add";
 
-export default async function Item({ params }: { params: { item: string } }) {
+export default async function Item(/* { params }: { params: { item: string } }*/) {
+  return notFound();
+
+  /* 
+  import { getItem } from "@/queries";
+  import Link from "next/link";
+  import { Suspense } from "react";
+
   const item = await getItem(params.item);
-  if (!item) return notFound();
   const { price, name, code, itemType, imageHref } = item;
 
   return (
@@ -20,8 +22,8 @@ export default async function Item({ params }: { params: { item: string } }) {
         <Link replace href={`/?filter=pathName=${itemType}`}>
           <p>{itemType}</p>
         </Link>
-        <Add item={item} />
       </main>
     </Suspense>
   );
+  */
 }

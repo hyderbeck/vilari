@@ -1,6 +1,7 @@
+import Load from "@/components/buttons/load";
+import { Spinner } from "@/components/icons";
 import Preview from "@/components/preview";
 import { getItems } from "@/queries";
-import Link from "next/link";
 import { Suspense } from "react";
 
 export default async function Home({
@@ -14,28 +15,28 @@ export default async function Home({
     filter: searchParams.filter,
   });
   return (
-    <main className="px-6 pt-32 flex-1 flex justify-center items-center">
-      <Suspense fallback={<p className="text-base font-normal">. . .</p>}>
-        <section className="flex flex-col items-center justify-center gap-y-6 w-full">
-          <div className="grid grid-cols-1 gap-8 w-full max-w-screen-lg 2xl:ml-12">
-            {items.length
-              ? items.map((item) => (
-                  <Preview key={item.id} item={item} page="home" />
-                ))
-              : "not found"}
-          </div>
-          {nextHref && (
-            <Link
-              replace
-              href={`?limit=${limit + 10}`}
-              scroll={false}
-              className="py-2 text-center bg-black text-white rounded font-normal w-28 2xl:ml-12"
-            >
-              Больше
-            </Link>
-          )}
-        </section>
-      </Suspense>
+    <main className="px-6 2xl:px-12 pt-32">
+      {items.length ? (
+        <Suspense
+          key={items[items.length - 1].id || ""}
+          fallback={
+            <div className="flex justify-center">
+              <Spinner />
+            </div>
+          }
+        >
+          <section className="flex flex-col items-center justify-center gap-y-12">
+            <div className="grid grid-cols-1 gap-y-12 w-full max-w-screen-lg">
+              {items.map((item) => (
+                <Preview key={item.id} item={item} page="home" />
+              ))}
+            </div>
+            {nextHref && <Load limit={limit} />}
+          </section>
+        </Suspense>
+      ) : (
+        <p className="text-center">Ничего не найдено</p>
+      )}
     </main>
   );
 }

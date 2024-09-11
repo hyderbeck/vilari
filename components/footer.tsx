@@ -4,14 +4,14 @@ import { atteron } from "./fonts/fonts";
 
 export default function Footer() {
   return (
-    <footer className="flex flex-col sm:flex-row bg-vlr-pattern-white pt-72 sm:pt-0 bg-center bg-vlr-white">
+    <footer className="flex flex-col sm:flex-row bg-vlr-ptrn pt-72 sm:pt-0 bg-center bg-vlr-white">
       <div className="flex flex-col gap-y-6 bg-white p-6 2xl:px-12 sm:py-3 border-black -mt-1 -mb-1">
         <address className="not-italic flex flex-col gap-y-6 pr-32">
           <div className="flex gap-x-3">
-            <a href="instagram.com/vilari_mhk">
+            <a href="https://instagram.com/vilari_mhk" target="_blank">
               <IGIcon />
             </a>
-            <a href="https://wa.me/+79933451128">
+            <a href="https://wa.me/+79933451128" target="_blank">
               <WAIcon />
             </a>
           </div>

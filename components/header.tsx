@@ -3,11 +3,15 @@ import { atteron } from "./fonts/fonts";
 import { getItemTypes } from "@/queries";
 import Menu from "./menu/menu";
 
-export default async function Header({ menu = false }: { menu?: boolean }) {
+export default async function Header({
+  layout,
+}: {
+  layout?: "home" | "checkout";
+}) {
   return (
     <header
       className={`fixed top-0 right-0 left-0 flex items-center justify-between bg-white p-6 2xl:px-12 ${
-        menu ? "shadow md:shadow-none" : "shadow"
+        layout === "home" ? "shadow md:shadow-none" : "shadow"
       }`}
     >
       <h1 className={`${atteron.className} text-4xl tracking-widest z-10`}>
@@ -15,12 +19,14 @@ export default async function Header({ menu = false }: { menu?: boolean }) {
           vilari
         </Link>
       </h1>
-      {menu ? (
+      {layout === "home" ? (
         <Menu itemTypes={await getItemTypes()} />
-      ) : (
+      ) : layout === "checkout" ? (
         <h2 className={`${atteron.className} text-2xl tracking-widest`}>
           Checkout
         </h2>
+      ) : (
+        ""
       )}
     </header>
   );

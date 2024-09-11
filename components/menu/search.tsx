@@ -5,16 +5,18 @@ import { SearchIcon } from "../icons";
 
 export default function Search({
   search,
-  onClick,
+  onButtonClick,
+  onInputClick,
 }: {
   search: boolean;
-  onClick: () => void;
+  onButtonClick: () => void;
+  onInputClick: () => void;
 }) {
   const searchParams = useSearchParams();
   const { replace } = useRouter();
   return (
     <>
-      <button className="md:hidden z-10" onClick={onClick}>
+      <button className="md:hidden z-10" onClick={onButtonClick}>
         <SearchIcon />
       </button>
       <div
@@ -26,14 +28,16 @@ export default function Search({
         <SearchIcon className="relative left-10 md:ml-6" />
         <input
           type="search"
+          name="search"
           aria-label="search"
-          autoCorrect="false"
           onChange={(e) => {
             const search = e.target.value;
             replace(search ? `?search=${search}` : "/");
           }}
-          onClick={onClick}
+          onClick={onInputClick}
           defaultValue={searchParams.get("search")?.toString()}
+          autoCorrect="false"
+          spellCheck="false"
           className="flex-1 md:max-w-screen-xs lg:max-w-screen-sm 2xl:max-w-screen-lg px-4 pl-12 py-2 bg-inherit rounded-full outline-none text-base border border-black"
         />
       </div>

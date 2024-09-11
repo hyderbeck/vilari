@@ -34,8 +34,8 @@ export default function Bag({
       {items.length ? (
         <>
           <div
-            className={`flex flex-col overflow-y-scroll ${
-              !checkout ? "p-6 2xl:pr-12 gap-y-6" : "gap-y-12"
+            className={`flex flex-col overflow-y-scroll gap-y-6 p-6 ${
+              !checkout ? "2xl:pr-12" : "pt-10 lg:pl-0"
             }`}
           >
             {items.map((item) => (
@@ -47,9 +47,9 @@ export default function Bag({
             ))}
           </div>
           <footer
-            className={`flex flex-col ${
-              !checkout ? "p-6 2xl:pr-12" : ""
-            } pt-0 gap-y-6`}
+            className={`flex flex-col gap-y-6 ${
+              !checkout ? "p-6 pt-0 2xl:pr-12" : "px-6 lg:pl-0"
+            }`}
           >
             <p className="flex items-center justify-between w-full border-t pt-6">
               <span>Итого</span>

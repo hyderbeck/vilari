@@ -7,7 +7,7 @@ export default async function HomeLayout({
 }>) {
   return (
     <>
-      <Header menu />
+      <Header layout="home" />
       {children}
     </>
   );
