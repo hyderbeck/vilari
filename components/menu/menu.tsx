@@ -11,12 +11,19 @@ export default function Menu({ itemTypes }: { itemTypes: ItemTypes }) {
   const [bag, setBag] = useState(false);
   const [nav, setNav] = useState(false);
 
-  function closeNav() {
+  function close() {
     setNav(false);
+    setBag(false);
     document.body.style.overflow = "auto";
     document.body
       .getElementsByTagName("h1")[0]
-      .removeEventListener("click", closeNav);
+      .removeEventListener("click", close);
+    document.body
+      .getElementsByTagName("main")[0]
+      .removeEventListener("click", close);
+    document.body
+      .getElementsByTagName("footer")[0]
+      .removeEventListener("click", close);
   }
 
   function unlock() {
@@ -64,6 +71,15 @@ export default function Menu({ itemTypes }: { itemTypes: ItemTypes }) {
           setBag(!bag);
           document.body.style.overflow = bag ? "auto" : "hidden";
           window.addEventListener("resize", unlock);
+          document.body
+            .getElementsByTagName("h1")[0]
+            .addEventListener("click", close);
+          document.body
+            .getElementsByTagName("main")[0]
+            .addEventListener("click", close);
+          document.body
+            .getElementsByTagName("footer")[0]
+            .addEventListener("click", close);
         }}
       />
       <Nav
@@ -75,7 +91,15 @@ export default function Menu({ itemTypes }: { itemTypes: ItemTypes }) {
           document.body.style.overflow = nav ? "auto" : "hidden";
           document.body
             .getElementsByTagName("h1")[0]
-            .addEventListener("click", closeNav);
+            .addEventListener("click", close);
+          document.body
+            .getElementsByTagName("main")[0]
+            .addEventListener("click", close);
+          document.body
+            .getElementsByTagName("footer")[0]
+            .addEventListener("click", close);
+          document.body.getElementsByTagName("main")[0].style.paddingTop =
+            "8rem";
         }}
         itemTypes={itemTypes}
       />

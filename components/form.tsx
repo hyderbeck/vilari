@@ -67,7 +67,7 @@ export default function Form({
           aria-label="phone"
           autoComplete="on"
           required
-          pattern="[0-9]{6,}"
+          pattern="\+?[0-9]{6,}"
           placeholder="Телефон для связи"
           className="py-2 bg-inherit outline-none border-b rounded-none text-base xs:text-sm"
           autoCorrect="false"
@@ -108,7 +108,7 @@ export default function Form({
       </form>
     </>
   ) : mount ? (
-    <p className="text-center w-full">В корзине пусто</p>
+    <p className="text-center w-full">В корзине ничего нет</p>
   ) : (
     <p className="h-screen"></p>
   );

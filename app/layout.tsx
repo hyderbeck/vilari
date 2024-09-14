@@ -10,7 +10,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "Vilari",
-  description: "Seletti, Bitossi, ИФЗ и другие бренды",
+  description: "Посуда и декор от Seletti, Bitossi, ИФЗ и других брендов",
 };
 
 export default function RootLayout({

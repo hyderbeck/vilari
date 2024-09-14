@@ -27,7 +27,7 @@ export default function Nav({
         } pt-[88px] md:pt-14 w-full md:max-w-xs md:-z-10 md:overflow-scroll bg-white md:shadow nav`}
       >
         <div
-          className={`flex flex-col items-center p-6 border-t md:border-none overflow-scroll md:overflow-auto max-h-full`}
+          className={`flex flex-col items-center py-6 md:pb-9 border-t md:border-none overflow-scroll md:overflow-auto max-h-full`}
         >
           {group ? (
             <button

@@ -21,7 +21,7 @@ export default function Preview({
           : "flex justify-between gap-x-6 h-[100px]"
       }
     >
-      <img alt="item" src={imageHref} className="w-[100px] aspect-square" />
+      <img alt="item" src={imageHref} />
       <p
         className={
           page
