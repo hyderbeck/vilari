@@ -7,9 +7,11 @@ import { Spinner } from "../icons";
 export default function Submit({
   items,
   onClick,
+  pre,
 }: {
   items: ItemPreview[];
   onClick: () => void;
+  pre?: boolean;
 }) {
   const { pending } = useFormStatus();
   return (
@@ -20,7 +22,7 @@ export default function Submit({
       className="py-2 text-center bg-black text-white rounded font-normal flex justify-center items-center gap-x-3"
     >
       {pending && <Spinner />}
-      Оформить
+      Оформить {pre ? "предзаказ" : "заказ"}
     </button>
   );
 }

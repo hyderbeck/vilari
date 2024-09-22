@@ -28,46 +28,45 @@ async function getImageHref(id: string) {
   return images[rowIndex].miniature.downloadHref as string;
 }
 
-async function getItemStock(code: string) {
-  const data = (await fetchData(`assortment?filter=article=${code}`)).rows;
-  if (!data || !data.length) return;
-  return data[0].stock as number;
-}
-
 export async function getItems(
   limit: number,
-  params?: { search?: string; filter?: string }
+  params: { search?: string; filter?: string; stock: boolean }
 ) {
-  let endpoint = `product?limit=${limit}`;
-  if (params?.search) endpoint += `&search=${params?.search}`;
-  if (params?.filter) endpoint += `&filter=${params?.filter}`;
+  let endpoint = `assortment?limit=${limit}`;
+  if (params.search) endpoint += `&search=${params?.search}`;
+  if (params.filter) endpoint += `&filter=${params?.filter}`;
+  if (params.stock) endpoint += "&filter=quantityMode=positiveOnly";
   const data = await fetchData(endpoint);
-  const items = await Promise.all(
-    data.rows.map(
-      async (item: {
-        id: string;
-        name: string;
-        code: string;
-        externalCode: string;
-        salePrices: [{ value: number }];
-      }) => {
-        return {
-          id: item.id,
-          name: item.name,
-          code: `${item.externalCode}, ${item.code}`,
-          price: item.salePrices[0].value,
-          imageHref: await getImageHref(item.id),
-          stock: await getItemStock(item.externalCode),
-          quantity: 0,
-        };
-      }
-    ) as ItemPreview[]
-  );
-
+  const items = (
+    await Promise.all(
+      data.rows.map(
+        async (item: {
+          id: string;
+          name: string;
+          code: string;
+          externalCode: string;
+          salePrices: [{ value: number }];
+          quantity: number;
+        }) => {
+          return {
+            id: item.id,
+            name: item.name,
+            code: `${item.externalCode}, ${item.code}`,
+            price: item.salePrices[0].value,
+            imageHref: await getImageHref(item.id),
+            stock: item.quantity > 0 ? item.quantity : 0,
+            quantity: 0,
+          };
+        }
+      ) as ItemPreview[]
+    )
+  ).filter((item) => item.imageHref);
+  if (!params.stock)
+    items.sort((a, b) =>
+      !a.stock && b.stock ? 1 : a.stock && !b.stock ? -1 : 0
+    );
   return {
-    items: items.filter(
-      (item) => item.imageHref && typeof item.stock !== "undefined"
-    ),
+    items,
     nextHref: !!data.meta.nextHref,
   };
 }
@@ -77,8 +76,6 @@ export async function getItem(id: string) {
   if ("errors" in item) return;
   const imageHref = await getImageHref(item.id);
   if (!imageHref) return;
-  const stock = await getItemStock(item.externalCode);
-  if (typeof stock === "undefined") return;
   return {
     id,
     name: item.name,
@@ -86,7 +83,7 @@ export async function getItem(id: string) {
     itemType: item.pathName,
     price: item.salePrices[0].value,
     imageHref,
-    stock,
+    stock: item.stock,
     quantity: 0,
   } as ItemPreview;
 }

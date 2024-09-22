@@ -5,12 +5,18 @@ import Preview from "./preview";
 export default async function Catalog({
   searchParams,
 }: {
-  searchParams: { limit?: number; search?: string; filter?: string };
+  searchParams: {
+    limit?: number;
+    search?: string;
+    filter?: string;
+    outOfStock?: string;
+  };
 }) {
   const limit = Number(searchParams.limit) || 10;
   const { items, nextHref } = await getItems(limit, {
     search: searchParams.search,
     filter: searchParams.filter,
+    stock: !searchParams.outOfStock,
   });
   return items.length ? (
     <section className="flex flex-col items-center justify-center gap-y-12">
@@ -19,12 +25,13 @@ export default async function Catalog({
           <Preview key={item.id} item={item} page="home" />
         ))}
       </div>
-      {nextHref && (
+      {(!searchParams.outOfStock || nextHref) && (
         <Load
           key={limit}
           limit={limit}
           search={searchParams.search}
           filter={searchParams.filter}
+          nextHref={nextHref}
         />
       )}
     </section>

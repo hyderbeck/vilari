@@ -39,10 +39,14 @@ async function placeOrder(_prevState: undefined | true, formData: FormData) {
   return true;
 }
 
-export default function Checkout() {
+export default function Checkout({
+  searchParams,
+}: {
+  searchParams: { pre?: boolean };
+}) {
   return (
     <main className="flex flex-col lg:flex-row items-center gap-12 2xl:gap-x-24 lg:px-6 2xl:px-12 pt-32">
-      <Form placeOrderAction={placeOrder} />
+      <Form placeOrderAction={placeOrder} pre={searchParams.pre} />
     </main>
   );
 }

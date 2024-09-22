@@ -5,17 +5,19 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import Preview from "./preview";
 
-export function getBag() {
-  return JSON.parse(localStorage.getItem("bag") || "[]") as ItemPreview[];
+export function getBag(pre?: boolean) {
+  return JSON.parse(
+    localStorage.getItem(pre ? "pre" : "bag") || "[]"
+  ) as ItemPreview[];
 }
 
-export function useItems() {
+export function useItems(pre?: boolean) {
   const [items, setItems] = useState([] as ItemPreview[]);
 
   useEffect(() => {
-    setItems(getBag());
-    window.addEventListener("bag", () => setItems(getBag()));
-  }, []);
+    setItems(getBag(pre));
+    window.addEventListener(pre ? "pre" : "bag", () => setItems(getBag(pre)));
+  }, [pre]);
 
   return items;
 }

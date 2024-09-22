@@ -33,7 +33,11 @@ export default function Preview({
       </p>
       {page === "home" && <p className="mr-auto hidden md:block">{code}</p>}
       <div className="flex flex-col justify-between items-end">
-        {page ? <Add item={item} /> : <p className="text-xs">{quantity}x</p>}
+        {page ? (
+          <Add item={item} page={page} />
+        ) : (
+          <p className="text-xs">{quantity}x</p>
+        )}
         <p className="text-base">{price / 100} RUB</p>
       </div>
     </article>

@@ -54,7 +54,7 @@ export default function Nav({
               <Link
                 replace
                 key={itemType.id}
-                href={"?filter=pathName=" + group + "/" + itemType.name}
+                href={"?filter=pathname=" + group + "/" + itemType.name}
                 onClick={() => {
                   onClick();
                   setGroup("");

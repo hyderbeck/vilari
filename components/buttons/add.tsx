@@ -3,6 +3,7 @@
 import { PlusIcon, MinusIcon } from "../icons";
 import { useItems } from "../bag";
 import { ItemPreview } from "@/interfaces";
+import Link from "next/link";
 
 function handleClick(
   item: ItemPreview,
@@ -26,7 +27,19 @@ function handleClick(
   window.dispatchEvent(new Event("bag"));
 }
 
-export default function Add({ item }: { item: ItemPreview }) {
+function handlePreorder(item: ItemPreview) {
+  item.quantity = 1;
+  localStorage.setItem("pre", JSON.stringify([item]));
+  window.dispatchEvent(new Event("pre"));
+}
+
+export default function Add({
+  item,
+  page,
+}: {
+  item: ItemPreview;
+  page: "home" | "checkout";
+}) {
   const items = useItems();
   const i = items.findIndex(({ id }) => id === item.id);
   const quantity = i >= 0 ? items[i].quantity : 0;
@@ -49,13 +62,24 @@ export default function Add({ item }: { item: ItemPreview }) {
         <PlusIcon />
       </button>
     </section>
-  ) : (
+  ) : item.stock ? (
     <button
       onClick={() => handleClick(item, items, i)}
-      disabled={!item.stock}
       className={`${className} justify-center`}
     >
-      {item.stock ? "В корзину" : "Ожидается"}
+      В корзину
     </button>
+  ) : page === "checkout" ? (
+    <button disabled className={`${className} justify-center`}>
+      Предзаказ
+    </button>
+  ) : (
+    <Link
+      href="/checkout?pre=true"
+      onClick={() => handlePreorder(item)}
+      className={`${className} justify-center`}
+    >
+      Предзаказ
+    </Link>
   );
 }

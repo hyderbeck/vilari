@@ -7,28 +7,30 @@ import Submit from "./buttons/submit";
 
 export default function Form({
   placeOrderAction,
+  pre,
 }: {
   placeOrderAction: (
     _prevState: undefined | true,
     formData: FormData
   ) => Promise<undefined | true>;
+  pre?: boolean;
 }) {
   const [mount, setMount] = useState(false);
   const [clicked, setClicked] = useState(false);
   const [state, formAction] = useFormState(placeOrderAction, undefined);
-  const items = useItems();
+  const items = useItems(pre);
 
   useEffect(() => {
     setMount(true);
     if (state) {
-      localStorage.setItem("bag", "[]");
-      window.dispatchEvent(new Event("bag"));
+      localStorage.setItem(pre ? "pre" : "bag", "[]");
+      window.dispatchEvent(new Event(pre ? "pre" : "bag"));
       window.scrollTo(0, 0);
     }
-  }, [state]);
+  }, [state, pre]);
 
   return state ? (
-    <p className="text-center w-full">Заказ оформлен</p>
+    <p className="text-center w-full">{pre ? "Предзаказ" : "Заказ"} оформлен</p>
   ) : items.length ? (
     <>
       <Bag
@@ -94,13 +96,14 @@ export default function Form({
           spellCheck="false"
         />
         <Submit
+          pre={pre}
           items={items}
           onClick={() => {
             setClicked(clicked);
             const form = document.getElementById("form")!;
             const bag = document.createElement("input");
             bag.setAttribute("name", "bag");
-            bag.value = JSON.stringify(getBag());
+            bag.value = JSON.stringify(getBag(pre));
             bag.style.display = "none";
             form.appendChild(bag);
           }}
