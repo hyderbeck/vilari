@@ -19,8 +19,8 @@ export default async function Catalog({
     stock: !searchParams.outOfStock,
   });
   return items.length ? (
-    <section className="flex flex-col items-center justify-center gap-y-12">
-      <div className="grid grid-cols-1 gap-y-12 w-full max-w-screen-lg">
+    <section className="flex flex-col items-center gap-y-12">
+      <div className="grid xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-x-12 gap-y-6">
         {items.map((item) => (
           <Preview key={item.id} item={item} page="home" />
         ))}

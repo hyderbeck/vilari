@@ -38,7 +38,7 @@ export default function Add({
   page,
 }: {
   item: ItemPreview;
-  page: "home" | "checkout";
+  page: "home" | "checkout" | "item";
 }) {
   const items = useItems();
   const i = items.findIndex(({ id }) => id === item.id);

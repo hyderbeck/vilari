@@ -6,7 +6,10 @@ export interface Item {
 
 export interface ItemPreview extends Item {
   name: string;
-  code: string;
+  material: string;
+  size: string;
+  designer: { href: string; name: string };
+  collection: { href: string; name: string };
   imageHref: string;
   itemType: string;
   stock: number;

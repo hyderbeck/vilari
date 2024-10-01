@@ -24,10 +24,10 @@ export default function Nav({
       <nav
         className={`fixed md:absolute top-0 md:top-auto right-0 bottom-0 md:bottom-auto left-0 md:left-auto ${
           nav ? "" : "hidden"
-        } pt-[88px] md:pt-14 w-full md:max-w-xs md:-z-10 md:overflow-scroll bg-white md:shadow nav`}
+        } pt-[88px] md:pt-14 w-full md:max-w-xs md:-z-10 md:overflow-scroll bg-white nav`}
       >
         <div
-          className={`flex flex-col items-center py-6 md:pb-9 border-t md:border-none overflow-scroll md:overflow-auto max-h-full`}
+          className={`flex flex-col items-center py-6 md:pb-9 overflow-scroll md:overflow-auto max-h-full`}
         >
           {group ? (
             <button
@@ -50,31 +50,35 @@ export default function Nav({
             </Link>
           )}
           {group ? (
-            itemTypes[group].map((itemType) => (
-              <Link
-                replace
-                key={itemType.id}
-                href={"?filter=pathname=" + group + "/" + itemType.name}
-                onClick={() => {
-                  onClick();
-                  setGroup("");
-                }}
-                className={className}
-              >
-                {itemType.name}
-              </Link>
-            ))
-          ) : (
-            <>
-              {Object.keys(itemTypes).map((key) => (
-                <button
-                  key={key}
-                  onClick={() => setGroup(key)}
+            itemTypes[group]
+              .sort((a, b) => (a.name > b.name ? 1 : -1))
+              .map((itemType) => (
+                <Link
+                  replace
+                  key={itemType.id}
+                  href={"?filter=pathname=" + group + "/" + itemType.name}
+                  onClick={() => {
+                    onClick();
+                    setGroup("");
+                  }}
                   className={className}
                 >
-                  {key}
-                </button>
-              ))}
+                  {itemType.name}
+                </Link>
+              ))
+          ) : (
+            <>
+              {Object.keys(itemTypes)
+                .sort()
+                .map((key) => (
+                  <button
+                    key={key}
+                    onClick={() => setGroup(key)}
+                    className={className}
+                  >
+                    {key}
+                  </button>
+                ))}
             </>
           )}
         </div>

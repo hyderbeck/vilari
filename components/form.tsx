@@ -27,7 +27,7 @@ export default function Form({
       window.dispatchEvent(new Event(pre ? "pre" : "bag"));
       window.scrollTo(0, 0);
     }
-  }, [state, pre]);
+  }, [state, pre, items]);
 
   return state ? (
     <p className="text-center w-full">{pre ? "Предзаказ" : "Заказ"} оформлен</p>

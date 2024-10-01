@@ -18,14 +18,20 @@ export async function fetchData(endpoint: string, body?: Object) {
   ).json();
 }
 
-async function getImageHref(id: string) {
+export async function getImageHref(id: string) {
+  if (!id) return;
   const images = (await fetchData(`product/${id}/images`)).rows;
   if (!images || !images.length) return;
-  const rowIndex = (images as []).findIndex(
-    (row: { miniature?: {} }) => row.miniature
-  );
-  if (rowIndex < 0) return;
-  return images[rowIndex].miniature.downloadHref as string;
+  return (
+    await fetch(images[0].meta.downloadHref, {
+      method: "GET",
+      headers: {
+        Authorization:
+          "Basic " + Buffer.from(process.env.CREDENTIALS!).toString("base64"),
+      },
+      redirect: "manual",
+    })
+  ).headers.get("location");
 }
 
 export async function getItems(
@@ -41,26 +47,70 @@ export async function getItems(
     await Promise.all(
       data.rows.map(
         async (item: {
+          meta: {
+            href: string;
+          };
           id: string;
           name: string;
-          code: string;
-          externalCode: string;
           salePrices: [{ value: number }];
           quantity: number;
+          pathName: string;
+          attributes: [
+            { name: "Материал"; value: { name: string } },
+            { name: "Размер"; value: string },
+            { name: "Коллекция" },
+            { name: "Бренд"; value: { name: string; meta: { href: string } } },
+            { name: "Название товара"; value: string },
+            {
+              name: "Collection";
+              value: { name: string; meta: { href: string } };
+            },
+            { name: "skip"; value: number }
+          ];
         }) => {
+          let name = "";
+          let material = "Материал";
+          let size = "Размер";
+          let designer = { href: "", name: "БРЕНД" };
+          let collection = { name: "", href: "" };
+          item.attributes?.forEach((attr: any) => {
+            if (attr.name === "Название товара") {
+              name = attr.value;
+            } else if (attr.name === "Размер") {
+              size = attr.value;
+            } else if (attr.name === "Бренд") {
+              designer.href = attr.value.meta.href;
+              designer.name = attr.value.name;
+            } else if (attr.name === "Collection") {
+              collection.href = attr.value.meta.href;
+              collection.name = attr.value.name;
+            } else if (attr.name === "skip") {
+              name = "";
+              collection = { name: "", href: "" };
+              designer = { href: "", name: "" };
+            }
+          });
+          if (item.meta.href.includes("variant")) {
+            name = "";
+            collection = { name: "", href: "" };
+            designer = { href: "", name: "" };
+          }
           return {
             id: item.id,
-            name: item.name,
-            code: `${item.externalCode}, ${item.code}`,
+            name,
+            material,
+            size,
+            designer,
+            collection,
             price: item.salePrices[0].value,
-            imageHref: await getImageHref(item.id),
             stock: item.quantity > 0 ? item.quantity : 0,
             quantity: 0,
+            itemType: item.pathName || "",
           };
         }
       ) as ItemPreview[]
     )
-  ).filter((item) => item.imageHref);
+  ).filter((item) => item.name || item.collection.name || item.designer.name);
   if (!params.stock)
     items.sort((a, b) =>
       !a.stock && b.stock ? 1 : a.stock && !b.stock ? -1 : 0
@@ -72,17 +122,47 @@ export async function getItems(
 }
 
 export async function getItem(id: string) {
-  const item = await fetchData(`product/${id}`);
+  let item = await fetchData(`assortment?filter=id=${id}`);
   if ("errors" in item) return;
-  const imageHref = await getImageHref(item.id);
-  if (!imageHref) return;
+  item = item.rows[0];
+  let name = "";
+  let material = "Материал";
+  let size = "Размер";
+  let designer = { href: "", name: "БРЕНД" };
+  let collection = { name: "", href: "" };
+  item.attributes?.forEach((attr: any) => {
+    if (attr.name === "Название товара") {
+      name = attr.value;
+    } else if (attr.name === "Материал") {
+      material = attr.value.name;
+    } else if (attr.name === "Размер") {
+      size = attr.value;
+    } else if (attr.name === "Бренд") {
+      designer.href = attr.value.meta.href;
+      designer.name = attr.value.name;
+    } else if (attr.name === "Collection") {
+      collection.href = attr.value.meta.href;
+      collection.name = attr.value.name;
+    } else if (attr.name === "skip") {
+      name = "";
+      collection = { name: "", href: "" };
+      designer = { href: "", name: "" };
+    }
+  });
+  if (item.meta.href.includes("variant")) {
+    name = "";
+    collection = { name: "", href: "" };
+    designer = { href: "", name: "" };
+  }
   return {
     id,
-    name: item.name,
-    code: `${item.externalCode}, ${item.code}`,
+    name,
+    material,
+    size,
+    designer,
+    collection,
     itemType: item.pathName,
     price: item.salePrices[0].value,
-    imageHref,
     stock: item.stock,
     quantity: 0,
   } as ItemPreview;

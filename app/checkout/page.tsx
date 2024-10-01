@@ -45,7 +45,7 @@ export default function Checkout({
   searchParams: { pre?: boolean };
 }) {
   return (
-    <main className="flex flex-col lg:flex-row items-center gap-12 2xl:gap-x-24 lg:px-6 2xl:px-12 pt-32">
+    <main className="flex flex-col lg:flex-row items-center xl:justify-center gap-12 2xl:gap-x-24 lg:px-6 2xl:px-12 pt-32">
       <Form placeOrderAction={placeOrder} pre={searchParams.pre} />
     </main>
   );

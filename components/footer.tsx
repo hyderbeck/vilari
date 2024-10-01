@@ -17,7 +17,7 @@ export default function Footer() {
           </div>
           <a
             href="tel:+79933451128"
-            className="underline underline-offset-4 text-base font-normal"
+            className="w-fit underline underline-offset-4 text-base font-normal"
           >
             +7 (993) 345 11 28
           </a>
