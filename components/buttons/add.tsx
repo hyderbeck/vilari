@@ -44,7 +44,7 @@ export default function Add({
   const i = items.findIndex(({ id }) => id === item.id);
   const quantity = i >= 0 ? items[i].quantity : 0;
   const className =
-    "flex gap-x-3 items-center p-2 h-10 text-white font-normal bg-black rounded w-28";
+    "flex gap-x-3 items-center p-2 h-10 font-normal border border-black rounded w-28";
 
   return quantity ? (
     <section className={`${className} justify-between`}>

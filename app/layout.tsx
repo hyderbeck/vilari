@@ -21,7 +21,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.className} font-light text-sm tracking-wide flex flex-col gap-y-12 justify-between bg-white min-h-screen`}
+        className={`${inter.className} font-light text-sm tracking-wide flex flex-col gap-y-12 justify-between min-h-screen`}
       >
         {children}
         <Footer />

@@ -16,15 +16,15 @@ export default function Search({
   const { replace } = useRouter();
   return (
     <>
-      <button className="md:hidden z-10" onClick={onButtonClick}>
+      <button className="z-10" onClick={onButtonClick} aria-label="search">
         <SearchIcon />
       </button>
       <div
-        className={`absolute mt-14 md:m-0 md:top-0 right-0 md:bottom-0 left-0 ${
-          !search ? "hidden md:flex" : "flex"
-        } justify-center items-center p-6 pt-0 md:pt-6 pl-0 md:pl-6 bg-white`}
+        className={`absolute top-16 right-0 left-0 ${
+          search ? "flex" : "hidden"
+        } justify-center items-center px-6 py-2 mt-6 2xl:px-12 bg-white shadow border-t`}
       >
-        <SearchIcon className="relative left-10 md:ml-6" />
+        <SearchIcon />
         <input
           type="search"
           name="search"
@@ -37,7 +37,7 @@ export default function Search({
           defaultValue={searchParams.get("search")?.toString()}
           autoCorrect="false"
           spellCheck="false"
-          className="flex-1 md:max-w-screen-xs lg:max-w-screen-sm 2xl:max-w-screen-lg px-4 pl-12 py-2 bg-inherit rounded-full outline-none text-base border border-black"
+          className="flex-1 p-4 text-base bg-inherit rounded-none outline-none"
         />
       </div>
     </>

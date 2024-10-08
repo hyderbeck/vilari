@@ -5,6 +5,8 @@ import { NavIcon } from "../icons";
 import { useState } from "react";
 import Link from "next/link";
 
+// do top- instead of pt-?
+
 export default function Nav({
   nav,
   onClick,
@@ -15,73 +17,77 @@ export default function Nav({
   itemTypes: ItemTypes;
 }) {
   const [group, setGroup] = useState("");
-  const className = "text-base xs:hover:font-normal";
+  const className = "xs:hover:font-normal text-base";
   return (
     <>
-      <button className="z-10" onClick={onClick}>
+      <button className="z-10 sm:hidden" onClick={onClick} aria-label="nav">
         <NavIcon />
       </button>
+      <nav className="hidden md:flex absolute top-8 left-[12.5rem] 2xl:left-[14rem]  w-full gap-x-6">
+        <Link href="" className="text-base tracking-normal">
+          Столовые предметы
+        </Link>
+        <Link href="" className="text-base tracking-normal">
+          Чайные предметы
+        </Link>
+        <Link href="" className="text-base tracking-normal">
+          Декор
+        </Link>
+      </nav>
       <nav
-        className={`fixed md:absolute top-0 md:top-auto right-0 bottom-0 md:bottom-auto left-0 md:left-auto ${
-          nav ? "" : "hidden"
-        } pt-[88px] md:pt-14 w-full md:max-w-xs md:-z-10 md:overflow-scroll bg-white nav`}
+        className={`absolute top-16 pt-6 mt-6 right-0 left-0 h-screen ${
+          nav ? "md:hidden" : "hidden"
+        } w-full border-t bg-white flex flex-col items-center overflow-scroll`}
       >
-        <div
-          className={`flex flex-col items-center py-6 md:pb-9 overflow-scroll md:overflow-auto max-h-full`}
-        >
-          {group ? (
-            <button
-              onClick={() => setGroup("")}
-              className={`${className} mb-3`}
-            >
-              {"<<"}
-            </button>
-          ) : (
-            <Link
-              replace
-              href="/"
-              className={`${className} mb-3`}
-              onClick={() => {
-                onClick();
-                setGroup("");
-              }}
-            >
-              Всё
-            </Link>
-          )}
-          {group ? (
-            itemTypes[group]
-              .sort((a, b) => (a.name > b.name ? 1 : -1))
-              .map((itemType) => (
-                <Link
-                  replace
-                  key={itemType.id}
-                  href={"?filter=pathname=" + group + "/" + itemType.name}
-                  onClick={() => {
-                    onClick();
-                    setGroup("");
-                  }}
+        {group ? (
+          <button onClick={() => setGroup("")} className={`${className} mb-3`}>
+            {"<<"}
+          </button>
+        ) : (
+          <Link
+            replace
+            href="/"
+            className={`${className} mb-3`}
+            onClick={() => {
+              onClick();
+              setGroup("");
+            }}
+          >
+            Всё
+          </Link>
+        )}
+        {group ? (
+          itemTypes[group]
+            .sort((a, b) => (a.name > b.name ? 1 : -1))
+            .map((itemType) => (
+              <Link
+                replace
+                key={itemType.id}
+                href={"?filter=pathname=" + group + "/" + itemType.name}
+                onClick={() => {
+                  onClick();
+                  setGroup("");
+                }}
+                className={className}
+              >
+                {itemType.name}
+              </Link>
+            ))
+        ) : (
+          <>
+            {Object.keys(itemTypes)
+              .sort()
+              .map((key) => (
+                <button
+                  key={key}
+                  onClick={() => setGroup(key)}
                   className={className}
                 >
-                  {itemType.name}
-                </Link>
-              ))
-          ) : (
-            <>
-              {Object.keys(itemTypes)
-                .sort()
-                .map((key) => (
-                  <button
-                    key={key}
-                    onClick={() => setGroup(key)}
-                    className={className}
-                  >
-                    {key}
-                  </button>
-                ))}
-            </>
-          )}
-        </div>
+                  {key}
+                </button>
+              ))}
+          </>
+        )}
       </nav>
     </>
   );

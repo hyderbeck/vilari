@@ -8,7 +8,7 @@ export default async function Home({
   searchParams: { limit?: number; search?: string; filter?: string };
 }) {
   return (
-    <main className="px-6 2xl:px-12 pt-32">
+    <main className="px-6 2xl:px-12 pt-28 flex-1">
       <Suspense
         key={searchParams.filter || searchParams.search}
         fallback={

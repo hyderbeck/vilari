@@ -1,11 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
 import { IGIcon, WAIcon } from "./icons";
-import { atteron } from "./fonts/fonts";
+import { atteron } from "../fonts";
 
 export default function Footer() {
   return (
     <footer className="flex flex-col sm:flex-row bg-vlr-ptrn pt-72 sm:pt-0 bg-center bg-vlr-white">
-      <div className="flex flex-col gap-y-6 bg-white p-6 2xl:px-12 sm:py-3 border-black -mt-1 -mb-1">
+      <div className="flex flex-col gap-y-6 bg-white p-6 2xl:px-12 sm:pb-3 sm:border-t sm:w-[24rem] 2xl:w-[27rem]">
         <address className="not-italic flex flex-col gap-y-6 pr-32">
           <div className="flex gap-x-3">
             <a href="https://instagram.com/vilari_mhk" target="_blank">

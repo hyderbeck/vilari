@@ -37,7 +37,7 @@ export default function Bag({
         <>
           <div
             className={`flex flex-col overflow-y-scroll gap-y-6 p-6 ${
-              !checkout ? "2xl:pr-12" : "pt-10 lg:pl-0"
+              !checkout ? "2xl:pr-12" : "pt-10 pb-0 lg:pl-0"
             }`}
           >
             {items.map((item) => (
@@ -53,13 +53,13 @@ export default function Bag({
               !checkout ? "p-6 pt-0 2xl:pr-12" : "px-6 lg:pl-0"
             }`}
           >
-            <p className="flex items-center justify-between w-full border-t pt-6">
+            <p className="flex items-center justify-between w-full pt-6 border-t">
               <span>Итого</span>
               <span className="text-base">
                 {items.reduce(
                   (total, item) => total + item.price * item.quantity,
                   0
-                ) / 100}{" "}
+                )}{" "}
                 RUB
               </span>
             </p>
@@ -75,7 +75,7 @@ export default function Bag({
           </footer>
         </>
       ) : (
-        <p className="p-6">Пусто</p>
+        <p className="p-6 text-base">Пусто</p>
       )}
     </section>
   );

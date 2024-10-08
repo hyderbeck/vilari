@@ -7,6 +7,10 @@ const nextConfig = {
         hostname: "storage.files.mow1.cloud.servers.ru",
         port: "8080",
       },
+      {
+        protocol: "https",
+        hostname: "rzpcucgkjsqqedurowkl.supabase.co",
+      },
     ],
   },
 };

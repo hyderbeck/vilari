@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import Search from "./search";
-import Bag from "./bag";
-import Nav from "./nav";
+import Search from "./menu/search";
+import Bag from "./menu/bag";
+import Nav from "./menu/nav";
 import { ItemTypes } from "@/interfaces";
 
 export default function Menu({ itemTypes }: { itemTypes: ItemTypes }) {
@@ -34,14 +34,6 @@ export default function Menu({ itemTypes }: { itemTypes: ItemTypes }) {
     }
   }
 
-  function revertPadding() {
-    if (window.innerWidth > 768 || window.location.pathname === "/checkout") {
-      document.body.getElementsByTagName("main")[0].style.paddingTop = "8rem";
-      setSearch(false);
-      window.removeEventListener("resize", revertPadding);
-    }
-  }
-
   return (
     <section className="flex gap-x-3">
       <Search
@@ -51,11 +43,8 @@ export default function Menu({ itemTypes }: { itemTypes: ItemTypes }) {
           setNav(false);
           setSearch(!search);
           document.body.style.overflow = "auto";
-          if (window.matchMedia("(max-width: 768px")) {
-            document.body.getElementsByTagName("main")[0].style.paddingTop =
-              search ? "8rem" : "12rem";
-            window.addEventListener("resize", revertPadding);
-          }
+          document.body.getElementsByTagName("main")[0].style.paddingTop =
+            search ? "7rem" : "11rem";
         }}
         onInputClick={() => {
           setBag(false);
@@ -71,15 +60,8 @@ export default function Menu({ itemTypes }: { itemTypes: ItemTypes }) {
           setBag(!bag);
           document.body.style.overflow = bag ? "auto" : "hidden";
           window.addEventListener("resize", unlock);
-          document.body
-            .getElementsByTagName("h1")[0]
-            .addEventListener("click", close);
-          document.body
-            .getElementsByTagName("main")[0]
-            .addEventListener("click", close);
-          document.body
-            .getElementsByTagName("footer")[0]
-            .addEventListener("click", close);
+          document.body.getElementsByTagName("main")[0].style.paddingTop =
+            "7rem";
         }}
       />
       <Nav
@@ -99,7 +81,7 @@ export default function Menu({ itemTypes }: { itemTypes: ItemTypes }) {
             .getElementsByTagName("footer")[0]
             .addEventListener("click", close);
           document.body.getElementsByTagName("main")[0].style.paddingTop =
-            "8rem";
+            "7rem";
         }}
         itemTypes={itemTypes}
       />

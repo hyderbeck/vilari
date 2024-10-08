@@ -25,7 +25,7 @@ export default function Load({
       replace
       href={endpoint}
       scroll={false}
-      className="p-2 text-center bg-black text-white rounded font-normal w-28 flex justify-center items-center gap-x-3"
+      className="p-2 text-center bg-black text-white rounded font-normal w-28 flex justify-center items-center gap-x-3 mx-auto"
       onClick={() => {
         setLoading(true);
       }}

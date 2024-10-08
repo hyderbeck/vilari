@@ -1,12 +1,9 @@
-import Header from "@/components/header";
+import Skeleton from "@/components/skeleton";
 
 export default function NotFound() {
   return (
-    <>
-      <Header />
-      <main className="pt-32 flex-1 flex items-center justify-center">
-        <p>404</p>
-      </main>
-    </>
+    <Skeleton>
+      <p className="text-base">404</p>
+    </Skeleton>
   );
 }

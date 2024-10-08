@@ -14,19 +14,14 @@ export default function Preview({
   item: ItemPreview;
   page?: "home" | "checkout" | "item";
 }) {
-  const { id, designer, collection, price, quantity, itemType } = item;
+  const { id, brand, collection, price } = item;
+  item.stock = 1;
   const [imageHref, setImageHref] = useState("");
   useEffect(() => {
-    async function getImage(id: string) {
-      const href = await (
-        await fetch(`http://192.168.1.158:3000/api/${id}`)
-      ).json();
-      setImageHref(href);
-    }
-    getImage(id);
+    setImageHref("a");
   }, []);
   const name =
-    (itemType.includes("Ваз") ? "Ваза" : "") +
+    "Ваза" +
     " " +
     collection.name.toUpperCase() +
     " " +
@@ -36,31 +31,29 @@ export default function Preview({
       className={
         page === "home"
           ? "flex flex-col xs:w-[225px] 2xl:w-[270px] gap-y-3"
-          : "flex gap-x-6"
+          : "flex gap-x-6 items-start"
       }
     >
       {imageHref ? (
         <Image
           alt="item"
-          src={imageHref}
+          src={`https://rzpcucgkjsqqedurowkl.supabase.co/storage/v1/object/public/objects/${id}/1.png`}
           width={400}
           height={400}
           className={
             page === "home"
               ? "xs:w-[225px] 2xl:w-[270px] aspect-square object-contain"
-              : "w-[150px] aspect-square object-contain"
+              : "min-w-[125px] w-[125px] max-w-[125px] aspect-square object-contain"
           }
         />
       ) : (
         <div
           className={
             page
-              ? "h-[342px] xs:h-[225px] 2xl:h-[270px] aspect-square flex justify-center items-center"
-              : "aspect-square h-[150px] flex justify-center items-center"
+              ? "min-w-[342px] xs:min-w-[225px] 2xl:min-w-[270px] aspect-square flex justify-center items-center"
+              : "min-w-[125px] w-[125px] max-w-[125px] aspect-square"
           }
-        >
-          <Spinner />
-        </div>
+        ></div>
       )}
       <div
         className={`flex ${
@@ -74,13 +67,10 @@ export default function Preview({
               : "flex flex-col w-[50px] gap-y-3"
           }
         >
-          <Link
-            href={`?filter=https://api.moysklad.ru/api/remap/1.2/entity/product/metadata/attributes/6da26107-62a7-11ee-0a80-0051000d3d54=${designer.href}`}
-            className="font-normal text-base"
-          >
-            {designer.name.toUpperCase()}
+          <Link href="" className="font-normal text-base">
+            {brand.name.toUpperCase()}
           </Link>
-          <p>
+          <p className={!page ? "w-[10px]" : ""}>
             {page !== "item" ? (
               <>
                 <Link href={`/${id}`}>{name}</Link>
@@ -111,9 +101,9 @@ export default function Preview({
           {page ? (
             <Add item={item} page={page} />
           ) : (
-            <p className="text-xs">{quantity}x</p>
+            <p className="text-xs">1x</p>
           )}
-          <p className="text-base">{price / 100} RUB</p>
+          <p className="text-base">{price} RUB</p>
         </div>
       </div>
     </article>
