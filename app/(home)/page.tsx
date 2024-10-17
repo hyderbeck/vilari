@@ -1,24 +1,42 @@
-import Catalog from "@/components/catalog";
+import Catalog from "./catalog";
 import { Spinner } from "@/components/icons";
 import { Suspense } from "react";
+import Home from "./home";
+import { SearchParams } from "@/interfaces";
+import { Main } from "@/components/skeleton";
 
-export default async function Home({
+export default async function Page({
   searchParams,
 }: {
-  searchParams: { limit?: number; search?: string; filter?: string };
+  searchParams: SearchParams;
 }) {
+  if (!(searchParams.type || searchParams.search))
+    return (
+      <Main className="flex flex-col justify-center items-center">
+        <Home />
+      </Main>
+    );
+
   return (
-    <main className="px-6 2xl:px-12 pt-28 flex-1">
+    <Main className="flex flex-col gap-y-12 px-6">
       <Suspense
-        key={searchParams.filter || searchParams.search}
+        key={
+          searchParams.search ||
+          searchParams.type ||
+          searchParams.brands ||
+          searchParams.collections ||
+          searchParams.designers ||
+          searchParams.materials ||
+          searchParams.order
+        }
         fallback={
-          <div className="flex justify-center">
-            <Spinner />
-          </div>
+          <>
+            <Spinner className="m-auto" />
+          </>
         }
       >
         <Catalog searchParams={searchParams} />
       </Suspense>
-    </main>
+    </Main>
   );
 }

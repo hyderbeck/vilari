@@ -1,4 +1,62 @@
-import { Item, ItemPreview, ItemTypes } from "./interfaces";
+import { ItemGroup, Item, SearchParams, Filters } from "./interfaces";
+import { createClient } from "./supabase";
+
+export async function getItem(
+  supabase: ReturnType<typeof createClient>,
+  id: number
+) {
+  const { data } = await supabase
+    .from("object")
+    .select(
+      `*, brand (*), collection (*), designer (*), material (*), type (*)`
+    )
+    .eq("id", id);
+  if (data?.length) return data[0] as Item;
+}
+
+export async function getItems(
+  supabase: ReturnType<typeof createClient>,
+  searchParams: SearchParams
+) {
+  let query = supabase
+    .from("object")
+    .select(`*, brand (*), collection (*), type (*)`, {
+      count: "exact",
+    })
+    .order(searchParams.order ? "price" : "id", {
+      ascending: searchParams.order === "desc" ? false : true,
+    });
+  if (searchParams.search)
+    query = query.ilike("full_name", `%${searchParams.search}%`);
+  if (searchParams.type && searchParams.type !== "all")
+    query = query.eq("type", searchParams.type);
+
+  if (searchParams.brands)
+    query = query.in("brand", searchParams.brands.split(","));
+  if (searchParams.collections)
+    query = query.in("collection", searchParams.collections.split(","));
+  if (searchParams.materials)
+    query = query.in("material", searchParams.materials.split(","));
+  if (searchParams.designers)
+    query = query.in("designer", searchParams.designers.split(","));
+
+  const { data, count } = await query.limit(Number(searchParams.limit) || 10);
+  if (!data?.length) return;
+  return { items: data as Item[], count };
+}
+
+export async function getItemGroups(supabase: ReturnType<typeof createClient>) {
+  const { data } = await supabase.from("type").select();
+  return data as ItemGroup[];
+}
+
+export async function getFilters(supabase: ReturnType<typeof createClient>) {
+  return {
+    brands: (await supabase.from("brand").select()).data,
+    collections: (await supabase.from("collection").select()).data,
+    materials: (await supabase.from("material").select()).data,
+  } as Filters;
+}
 
 export async function fetchData(endpoint: string, body?: Object) {
   const auth =
@@ -18,169 +76,6 @@ export async function fetchData(endpoint: string, body?: Object) {
   ).json();
 }
 
-export async function getImageHref(id: string) {
-  if (!id) return;
-  const images = (await fetchData(`product/${id}/images`)).rows;
-  if (!images || !images.length) return;
-  return (
-    await fetch(images[0].meta.downloadHref, {
-      method: "GET",
-      headers: {
-        Authorization:
-          "Basic " + Buffer.from(process.env.CREDENTIALS!).toString("base64"),
-      },
-      redirect: "manual",
-    })
-  ).headers.get("location");
-}
-
-export async function getItems(
-  limit: number,
-  params: { search?: string; filter?: string; stock: boolean }
-) {
-  let endpoint = `assortment?limit=${limit}`;
-  if (params.search) endpoint += `&search=${params?.search}`;
-  if (params.filter) endpoint += `&filter=${params?.filter}`;
-  if (params.stock) endpoint += "&filter=quantityMode=positiveOnly";
-  const data = await fetchData(endpoint);
-  const items = (
-    await Promise.all(
-      data.rows.map(
-        async (item: {
-          meta: {
-            href: string;
-          };
-          id: string;
-          name: string;
-          salePrices: [{ value: number }];
-          quantity: number;
-          pathName: string;
-          attributes: [
-            { name: "Материал"; value: { name: string } },
-            { name: "Размер"; value: string },
-            { name: "Коллекция" },
-            { name: "Бренд"; value: { name: string; meta: { href: string } } },
-            { name: "Название товара"; value: string },
-            {
-              name: "Collection";
-              value: { name: string; meta: { href: string } };
-            },
-            { name: "skip"; value: number }
-          ];
-        }) => {
-          let name = "";
-          let material = "Материал";
-          let size = "Размер";
-          let designer = { href: "", name: "БРЕНД" };
-          let collection = { name: "", href: "" };
-          item.attributes?.forEach((attr: any) => {
-            if (attr.name === "Название товара") {
-              name = attr.value;
-            } else if (attr.name === "Размер") {
-              size = attr.value;
-            } else if (attr.name === "Бренд") {
-              designer.href = attr.value.meta.href;
-              designer.name = attr.value.name;
-            } else if (attr.name === "Collection") {
-              collection.href = attr.value.meta.href;
-              collection.name = attr.value.name;
-            } else if (attr.name === "skip") {
-              name = "";
-              collection = { name: "", href: "" };
-              designer = { href: "", name: "" };
-            }
-          });
-          if (item.meta.href.includes("variant")) {
-            name = "";
-            collection = { name: "", href: "" };
-            designer = { href: "", name: "" };
-          }
-          return {
-            id: item.id,
-            name,
-            material,
-            size,
-            designer,
-            collection,
-            price: item.salePrices[0].value,
-            stock: item.quantity > 0 ? item.quantity : 0,
-            quantity: 0,
-            itemType: item.pathName || "",
-          };
-        }
-      ) as ItemPreview[]
-    )
-  ).filter((item) => item.name || item.collection.name || item.designer.name);
-  if (!params.stock)
-    items.sort((a, b) =>
-      !a.stock && b.stock ? 1 : a.stock && !b.stock ? -1 : 0
-    );
-  return {
-    items,
-    nextHref: !!data.meta.nextHref,
-  };
-}
-
-export async function getItem(id: string) {
-  let item = await fetchData(`assortment?filter=id=${id}`);
-  if ("errors" in item) return;
-  item = item.rows[0];
-  let name = "";
-  let material = "Материал";
-  let size = "Размер";
-  let designer = { href: "", name: "БРЕНД" };
-  let collection = { name: "", href: "" };
-  item.attributes?.forEach((attr: any) => {
-    if (attr.name === "Название товара") {
-      name = attr.value;
-    } else if (attr.name === "Материал") {
-      material = attr.value.name;
-    } else if (attr.name === "Размер") {
-      size = attr.value;
-    } else if (attr.name === "Бренд") {
-      designer.href = attr.value.meta.href;
-      designer.name = attr.value.name;
-    } else if (attr.name === "Collection") {
-      collection.href = attr.value.meta.href;
-      collection.name = attr.value.name;
-    } else if (attr.name === "skip") {
-      name = "";
-      collection = { name: "", href: "" };
-      designer = { href: "", name: "" };
-    }
-  });
-  if (item.meta.href.includes("variant")) {
-    name = "";
-    collection = { name: "", href: "" };
-    designer = { href: "", name: "" };
-  }
-  return {
-    id,
-    name,
-    material,
-    size,
-    designer,
-    collection,
-    itemType: item.pathName,
-    price: item.salePrices[0].value,
-    stock: item.stock,
-    quantity: 0,
-  } as ItemPreview;
-}
-
-export async function getItemTypes() {
-  const itemTypes: ItemTypes = {};
-  (await fetchData("productfolder")).rows.forEach(
-    (itemType: { id: string; pathName: string; name: string }) => {
-      const pathName = itemType.pathName;
-      if (!pathName) return;
-      if (!(pathName in itemTypes)) itemTypes[pathName] = [];
-      itemTypes[pathName].push({ id: itemType.id, name: itemType.name });
-    }
-  );
-  return itemTypes;
-}
-
 export async function getCustomer(name: string, phone: string) {
   let customer = (
     await fetchData(`counterparty?filter=phone~${phone.slice(2)}`)
@@ -194,7 +89,7 @@ export async function getCustomer(name: string, phone: string) {
 
 export async function createOrder(
   customerId: string,
-  bag: Item[],
+  bag: { id: string; quantity: number; price: number }[],
   description: string
 ) {
   return await fetchData("customerorder", {
@@ -210,7 +105,7 @@ export async function createOrder(
         type: "counterparty",
       },
     },
-    positions: bag.map(({ id, price, quantity }) => {
+    positions: bag.map(({ id, quantity, price }) => {
       return {
         assortment: {
           meta: {
@@ -218,8 +113,8 @@ export async function createOrder(
             type: "product",
           },
         },
-        price,
         quantity,
+        price,
       };
     }),
     description,

@@ -2,27 +2,26 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { SearchIcon } from "../icons";
+import { buildRef } from "@/utils";
 
 export default function Search({
   search,
-  onButtonClick,
-  onInputClick,
+  onClick,
 }: {
   search: boolean;
-  onButtonClick: () => void;
-  onInputClick: () => void;
+  onClick: () => void;
 }) {
   const searchParams = useSearchParams();
   const { replace } = useRouter();
   return (
     <>
-      <button className="z-10" onClick={onButtonClick} aria-label="search">
+      <button className="z-10" onClick={onClick} aria-label="search">
         <SearchIcon />
       </button>
       <div
-        className={`absolute top-16 right-0 left-0 ${
+        className={`absolute top-16 mt-6 right-0 left-0 ${
           search ? "flex" : "hidden"
-        } justify-center items-center px-6 py-2 mt-6 2xl:px-12 bg-white shadow border-t`}
+        } justify-center items-center gap-x-3 p-6 bg-white border-t border-b`}
       >
         <SearchIcon />
         <input
@@ -30,14 +29,17 @@ export default function Search({
           name="search"
           aria-label="search"
           onChange={(e) => {
-            const search = e.target.value;
-            replace(search ? `?search=${search}` : "/");
+            const search = e.target.value.trim();
+            const ref = buildRef({
+              search,
+              type: !search ? "all" : "",
+            });
+            replace(ref);
           }}
-          onClick={onInputClick}
           defaultValue={searchParams.get("search")?.toString()}
           autoCorrect="false"
           spellCheck="false"
-          className="flex-1 p-4 text-base bg-inherit rounded-none outline-none"
+          className="flex-1 text-base bg-inherit rounded-none outline-none"
         />
       </div>
     </>

@@ -1,14 +1,20 @@
-/* eslint-disable @next/next/no-img-element */
-import { getItem } from "@/queries";
-import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import Item from "./item";
+import { Spinner } from "@/components/icons";
+import { Main } from "@/components/skeleton";
 
-export default async function Page({ params }: { params: { item: string } }) {
-  const item = await getItem(params.item);
-  if (!item) return notFound();
+export default async function Page({ params }: { params: { item: number } }) {
   return (
-    <main className="px-6 pt-32 flex justify-center">
-      <Item item={item} page="item" />
-    </main>
+    <Main>
+      <Suspense
+        fallback={
+          <>
+            <Spinner className="m-auto" />
+          </>
+        }
+      >
+        <Item params={params} />
+      </Suspense>
+    </Main>
   );
 }

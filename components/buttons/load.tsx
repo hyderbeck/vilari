@@ -3,29 +3,24 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Spinner } from "../icons";
+import { buildRef } from "@/utils";
+import { SearchParams } from "@/interfaces";
 
 export default function Load({
-  limit,
-  search,
-  filter,
-  nextHref,
-}: {
-  limit: number;
-  search?: string;
-  filter?: string;
-  nextHref: boolean;
+  searchParams
+}:
+{
+  searchParams: SearchParams
 }) {
   const [loading, setLoading] = useState(false);
-  let endpoint = `?limit=${limit + 10}`;
-  if (search) endpoint += `&search=${search}`;
-  if (filter) endpoint += `&filter=${filter}`;
-  if (!nextHref) endpoint += `&outOfStock=true`;
+  searchParams.limit = String(Number(searchParams.limit) + 10)
+  const ref = buildRef(searchParams);
   return (
     <Link
       replace
-      href={endpoint}
+      href={ref}
       scroll={false}
-      className="p-2 text-center bg-black text-white rounded font-normal w-28 flex justify-center items-center gap-x-3 mx-auto"
+      className="btn mx-auto"
       onClick={() => {
         setLoading(true);
       }}

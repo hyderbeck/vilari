@@ -1,34 +1,29 @@
 "use client";
 
+import { useItems } from "@/app/hooks";
+import { Item } from "@/interfaces";
 import { PlusIcon, MinusIcon } from "../icons";
-import { useItems } from "../bag";
-import { ItemPreview } from "@/interfaces";
 import Link from "next/link";
 
-function handleClick(
-  item: ItemPreview,
-  items: ItemPreview[],
-  i: number,
-  add = true
-) {
+function handleOrder(item: Item, items: Item[], i: number, add = true) {
   const isAdded = i >= 0;
   if (add) {
     if (!isAdded) {
       items.push(item);
       i = items.findIndex(({ id }) => id == item.id);
-      items[i].quantity = 0;
+      items[i].amount = 0;
     }
-    items[i].quantity++;
+    items[i].amount!++;
   } else {
-    items[i].quantity--;
-    !items[i].quantity && items.splice(i, 1);
+    items[i].amount!--;
+    !items[i].amount && items.splice(i, 1);
   }
-  localStorage.setItem("bag", JSON.stringify(items));
-  window.dispatchEvent(new Event("bag"));
+  localStorage.setItem("order", JSON.stringify(items));
+  window.dispatchEvent(new Event("order"));
 }
 
-function handlePreorder(item: ItemPreview) {
-  item.quantity = 1;
+function handlePre(item: Item) {
+  item.amount = 1;
   localStorage.setItem("pre", JSON.stringify([item]));
   window.dispatchEvent(new Event("pre"));
 }
@@ -37,47 +32,40 @@ export default function Add({
   item,
   page,
 }: {
-  item: ItemPreview;
-  page: "home" | "checkout" | "item";
+  item: Item;
+  page?: "home" | "checkout" | "item";
 }) {
-  const items = useItems();
+  const items = useItems("order");
   const i = items.findIndex(({ id }) => id === item.id);
-  const quantity = i >= 0 ? items[i].quantity : 0;
-  const className =
-    "flex gap-x-3 items-center p-2 h-10 font-normal border border-black rounded w-28";
+  const amount = i >= 0 ? items[i].amount : 0;
 
-  return quantity ? (
-    <section className={`${className} justify-between`}>
-      <button onClick={() => handleClick(item, items, i, false)}>
+  return amount ? (
+    <section className="btn">
+      <button onClick={() => handleOrder(item, items, i, false)}>
         <MinusIcon />
       </button>
-      <p>{quantity}x</p>
+      <p>{amount}x</p>
       <button
-        onClick={() => handleClick(item, items, i)}
-        disabled={!item.stock || item.stock - quantity <= 0}
+        onClick={() => handleOrder(item, items, i)}
+        disabled={!item.quantity || item.quantity - amount <= 0}
         className={
-          !item.stock || item.stock - quantity <= 0 ? "text-black" : ""
+          !item.quantity || item.quantity - amount <= 0 ? "text-black" : ""
         }
       >
         <PlusIcon />
       </button>
     </section>
-  ) : item.stock ? (
-    <button
-      onClick={() => handleClick(item, items, i)}
-      className={`${className} justify-center`}
-    >
+  ) : item.quantity ? (
+    <button onClick={() => handleOrder(item, items, i)} className="btn">
       В корзину
     </button>
   ) : page === "checkout" ? (
-    <button disabled className={`${className} justify-center`}>
-      Предзаказ
-    </button>
+    <div className="btn">Предзаказ</div>
   ) : (
     <Link
       href="/checkout?pre=true"
-      onClick={() => handlePreorder(item)}
-      className={`${className} justify-center`}
+      onClick={() => handlePre(item)}
+      className="btn"
     >
       Предзаказ
     </Link>

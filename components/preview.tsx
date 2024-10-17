@@ -1,110 +1,187 @@
 "use client";
 
-import { ItemPreview } from "@/interfaces";
+import { Item } from "@/interfaces";
 import Add from "./buttons/add";
-import Link from "next/link";
-import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Spinner } from "./icons";
+import Link from "next/link";
+
+const groups: { [key: string]: string } = {
+  Вазы: "Ваза",
+};
 
 export default function Preview({
   item,
   page,
 }: {
-  item: ItemPreview;
+  item: Item;
   page?: "home" | "checkout" | "item";
 }) {
-  const { id, brand, collection, price } = item;
-  item.stock = 1;
-  const [imageHref, setImageHref] = useState("");
-  useEffect(() => {
-    setImageHref("a");
-  }, []);
+  const {
+    id,
+    brand,
+    collection,
+    designer,
+    material,
+    type,
+    lwh,
+    volume,
+    weight,
+    price,
+    quantity,
+  } = item;
+
   const name =
-    "Ваза" +
+    groups[type.name] +
     " " +
-    collection.name.toUpperCase() +
-    " " +
+    (collection ? collection.name.toUpperCase() + " " : "") +
     item.name.toUpperCase();
+
+  const description = collection?.description;
+
+  let d = 0;
+  if (lwh[0] === lwh[1]) d = lwh[0];
+
   return (
     <article
-      className={
+      className={`flex ${
         page === "home"
-          ? "flex flex-col xs:w-[225px] 2xl:w-[270px] gap-y-3"
-          : "flex gap-x-6 items-start"
-      }
+          ? "flex-col w-[250px]"
+          : page === "item"
+          ? "flex-col md:flex-row w-full justify-center items-center"
+          : page === "checkout"
+          ? "pb-6"
+          : "justify-between pb-6"
+      }`}
     >
-      {imageHref ? (
-        <Image
-          alt="item"
-          src={`https://rzpcucgkjsqqedurowkl.supabase.co/storage/v1/object/public/objects/${id}/1.png`}
-          width={400}
-          height={400}
-          className={
-            page === "home"
-              ? "xs:w-[225px] 2xl:w-[270px] aspect-square object-contain"
-              : "min-w-[125px] w-[125px] max-w-[125px] aspect-square object-contain"
-          }
-        />
-      ) : (
-        <div
-          className={
-            page
-              ? "min-w-[342px] xs:min-w-[225px] 2xl:min-w-[270px] aspect-square flex justify-center items-center"
-              : "min-w-[125px] w-[125px] max-w-[125px] aspect-square"
-          }
-        ></div>
-      )}
+      <Image
+        alt="item"
+        src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/objects/${id}/1.png`}
+        width={500}
+        height={500}
+        quality={100}
+        className={`${
+          page === "home"
+            ? "w-[250px]"
+            : page === "item"
+            ? "w-[350px] shrink-0"
+            : page === "checkout"
+            ? "w-[125px] xs:w-[250px]"
+            : "w-[125px] xs:w-[150px]"
+        } aspect-square`}
+      />
       <div
         className={`flex ${
-          page === "checkout" ? "flex-col xs:flex-row" : ""
-        } justify-between w-full`}
+          page === "home"
+            ? "flex-col"
+            : page === "item"
+            ? "flex-col px-6 md:w-[32rem]"
+            : "flex-1 justify-between"
+        }`}
       >
         <div
-          className={
+          className={`flex overflow-hidden ${
             page === "home"
-              ? "flex flex-col w-[150px] xs:w-[75px] gap-y-3"
-              : "flex flex-col w-[50px] gap-y-3"
-          }
+              ? "flex-col gap-y-1.5 mb-3"
+              : page === "item"
+              ? "flex-col gap-y-1 mb-1.5"
+              : "flex-col gap-y-3 -ml-3 mr-3 xs:mr-6"
+          }`}
         >
-          <Link href="" className="font-normal text-base">
-            {brand.name.toUpperCase()}
+          <Link
+            href={`/?type=all&brands=${brand.id}`}
+            className={`${
+              page === "item" ? "text-lg" : "text-base"
+            } font-normal uppercase w-fit`}
+          >
+            {brand.name}
           </Link>
-          <p className={!page ? "w-[10px]" : ""}>
-            {page !== "item" ? (
-              <>
-                <Link href={`/${id}`}>{name}</Link>
-                {collection.name && (
-                  <>
-                    /
-                    <Link
-                      href={`?filter=https://api.moysklad.ru/api/remap/1.2/entity/product/metadata/attributes/16711943-7caa-11ef-0a80-06b70009ddd6=${collection.href}`}
-                      className="font-thin hover:font-normal"
-                    >
-                      {collection.name}
-                    </Link>
-                  </>
-                )}
-              </>
+          <div>
+            {page === "item" ? (
+              <h2 className="text-2xl font-extralight tracking-tight">
+                {name}
+              </h2>
             ) : (
-              name
+              <Link href={`/${id}`}>{name}</Link>
             )}
-          </p>
+            {collection && page !== "item" && (
+              <>
+                /
+                <Link
+                  href={`/?type=all&collections=${collection.id}`}
+                  className="font-extralight"
+                >
+                  {collection.name}
+                </Link>
+              </>
+            )}
+          </div>
         </div>
         <div
-          className={
-            page
-              ? "flex flex-col items-end gap-y-3"
-              : "flex flex-col justify-between items-end"
-          }
+          className={`flex justify-between ${
+            page && ["home", "item"].includes(page)
+              ? "flex-row-reverse"
+              : "flex-col"
+          }`}
         >
-          {page ? (
+          <div>
             <Add item={item} page={page} />
-          ) : (
-            <p className="text-xs">1x</p>
-          )}
-          <p className="text-base">{price} RUB</p>
+            {page === "item" && quantity && (
+              <p className="text-xs text-center mt-1.5">
+                В наличии {quantity} шт
+              </p>
+            )}
+          </div>
+          <p className="text-base text-end">{price} RUB</p>
         </div>
+        {page === "item" && description && (
+          <p className="my-6 border-y py-6">{description}</p>
+        )}
+        {page === "item" && (
+          <p className="flex flex-col">
+            <span>{item.name}</span>
+            <span>Тип изделия: {groups[type.name]}</span>
+            <span>
+              Бренд:{" "}
+              <Link
+                href={`/?type=all&brands=${brand.id}`}
+                className="underline underline-offset-4"
+              >
+                {brand.name}
+              </Link>
+            </span>
+            <span>Производство: {brand.country}</span>
+            {collection && (
+              <span>
+                Коллекция:{" "}
+                <Link
+                  href={`/?type=all&collections=${collection.id}`}
+                  className="underline underline-offset-4"
+                >
+                  {collection.name}
+                </Link>
+              </span>
+            )}
+            {designer && (
+              <span>
+                Дизайнер:{" "}
+                <Link
+                  href={`/?type=all&designers=${designer.id}`}
+                  className="underline underline-offset-4"
+                >
+                  {designer.name}
+                </Link>
+              </span>
+            )}
+            <span>Материал: {material.name}</span>
+            <span>
+              {d
+                ? ["⌀", d, "h", lwh[2]].join(" ")
+                : lwh[0] + " x " + lwh[1] + " x " + lwh[2]}
+            </span>
+            {volume && <span>{volume}</span>}
+            {weight && <span>{weight}</span>}
+          </p>
+        )}
       </div>
     </article>
   );

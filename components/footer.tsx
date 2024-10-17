@@ -1,12 +1,11 @@
-/* eslint-disable @next/next/no-img-element */
 import { IGIcon, WAIcon } from "./icons";
-import { atteron } from "../fonts";
+import { atteron } from "../app/fonts";
 
 export default function Footer() {
   return (
-    <footer className="flex flex-col sm:flex-row bg-vlr-ptrn pt-72 sm:pt-0 bg-center bg-vlr-white">
-      <div className="flex flex-col gap-y-6 bg-white p-6 2xl:px-12 sm:pb-3 sm:border-t sm:w-[24rem] 2xl:w-[27rem]">
-        <address className="not-italic flex flex-col gap-y-6 pr-32">
+    <footer className="bg-vlr-white bg-vlr-ptrn pt-72 md:pt-0">
+      <div className="bg-white md:w-[24rem] flex flex-col gap-y-6 p-6 mb-[9rem] md:mb-0 md:border-t">
+        <address className="not-italic flex flex-col gap-y-6">
           <div className="flex gap-x-3">
             <a href="https://instagram.com/vilari_mhk" target="_blank">
               <IGIcon />
@@ -17,7 +16,7 @@ export default function Footer() {
           </div>
           <a
             href="tel:+79933451128"
-            className="w-fit underline underline-offset-4 text-base font-normal"
+            className="text-base underline underline-offset-4 w-fit"
           >
             +7 (993) 345 11 28
           </a>
@@ -27,7 +26,7 @@ export default function Footer() {
             <a
               href="http://maps.google.com/?q=Ulitsa Batyrmurzayeva, 85, Makhachkala, Republic of Dagestan, Russia, 367008"
               target="_blank"
-              className="underline underline-offset-4 font-normal"
+              className="underline underline-offset-4"
             >
               Батырмурзаева 85
             </a>
@@ -37,10 +36,7 @@ export default function Footer() {
             11:00 - 19:00 (кроме пятницы)
           </div>
         </address>
-        <img alt="vilari" src="logo.png" className="w-40 sm:hidden" />
-        <p
-          className={`hidden sm:block ${atteron.className} text-2xl tracking-widest`}
-        >
+        <p className={`${atteron.className} text-2xl tracking-widest`}>
           vilari
         </p>
       </div>

@@ -1,5 +1,6 @@
-import Form from "@/components/form";
-import { ItemPreview } from "@/interfaces";
+import { Main } from "@/components/skeleton";
+import Checkout from "./checkout";
+import { Item } from "@/interfaces";
 import { createOrder, getCustomer } from "@/queries";
 
 async function placeOrder(_prevState: undefined | true, formData: FormData) {
@@ -8,7 +9,7 @@ async function placeOrder(_prevState: undefined | true, formData: FormData) {
   const customer = {
     name: ((formData.get("name") as string) || "").trim(),
     phone: ((formData.get("phone") as string) || "").trim(),
-    bag: JSON.parse(formData.get("bag") as string) as ItemPreview[],
+    bag: JSON.parse(formData.get("bag") as string) as Item[],
     description: ((formData.get("description") as string) || "").trim(),
   };
 
@@ -18,7 +19,7 @@ async function placeOrder(_prevState: undefined | true, formData: FormData) {
     !customer.phone ||
     customer.phone.length < 6 ||
     customer.phone.length > 20 ||
-    !/^\d+$/.test(customer.phone)
+    !/^(\+\d+)|(\d+)$/.test(customer.phone)
   )
     return;
   if (!customer.bag.length) return;
@@ -29,9 +30,9 @@ async function placeOrder(_prevState: undefined | true, formData: FormData) {
     customerId,
     customer.bag.map((item) => {
       return {
-        id: item.id,
-        quantity: 1,
-        price: item.price,
+        id: item.moysklad_id,
+        quantity: item.quantity,
+        price: item.price * 100,
       };
     }),
     customer.description
@@ -39,14 +40,14 @@ async function placeOrder(_prevState: undefined | true, formData: FormData) {
   return true;
 }
 
-export default function Checkout({
+export default async function Page({
   searchParams,
 }: {
-  searchParams: { pre?: boolean };
+  searchParams: { bag?: "pre" };
 }) {
   return (
-    <main className="flex flex-col lg:flex-row items-center xl:justify-center gap-12 2xl:gap-x-24 lg:px-6 2xl:px-12 pt-32">
-      <Form placeOrderAction={placeOrder} pre={searchParams.pre} />
-    </main>
+    <Main className="flex flex-col md:flex-row gap-y-12 justify-center items-center md:items-start">
+      <Checkout placeOrderAction={placeOrder} bag={searchParams.bag} />
+    </Main>
   );
 }

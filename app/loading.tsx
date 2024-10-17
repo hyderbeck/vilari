@@ -3,10 +3,8 @@ import { Spinner } from "@/components/icons";
 
 export default function Loading() {
   return (
-    <>
-      <Skeleton>
-        <Spinner />
-      </Skeleton>
-    </>
+    <Skeleton>
+      <Spinner />
+    </Skeleton>
   );
 }

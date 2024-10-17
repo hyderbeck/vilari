@@ -1,57 +1,56 @@
 "use client";
 
-import Bag, { getBag, useItems } from "./bag";
-import { useEffect, useState } from "react";
+import Bag from "@/components/bag";
+import { useItems } from "@/app/hooks";
+import { useEffect } from "react";
 import { useFormState } from "react-dom";
-import Submit from "./buttons/submit";
+import Submit from "@/components/buttons/submit";
 
-export default function Form({
+export default function Checkout({
   placeOrderAction,
-  pre,
+  bag = "order",
 }: {
   placeOrderAction: (
     _prevState: undefined | true,
     formData: FormData
   ) => Promise<undefined | true>;
-  pre?: boolean;
+  bag?: "pre" | "order";
 }) {
-  const [mount, setMount] = useState(false);
-  const [clicked, setClicked] = useState(false);
   const [state, formAction] = useFormState(placeOrderAction, undefined);
-  const items = useItems(pre);
+  const items = useItems(bag);
 
   useEffect(() => {
-    setMount(true);
     if (state) {
-      localStorage.setItem(pre ? "pre" : "bag", "[]");
-      window.dispatchEvent(new Event(pre ? "pre" : "bag"));
-      window.scrollTo(0, 0);
+      localStorage.setItem(bag, "[]");
+      window.dispatchEvent(new Event(bag));
     }
-  }, [state, pre, items]);
+  }, [state, bag]);
 
   return state ? (
-    <p className="text-center w-full">{pre ? "Предзаказ" : "Заказ"} оформлен</p>
+    <p className="m-auto text-base">
+      {bag === "order" ? "Заказ" : "Предзаказ"} оформлен!
+    </p>
   ) : items.length ? (
     <>
       <Bag
         items={items}
-        className="flex flex-col w-full max-w-screen-sm max-h-[55vh] xs:max-h-[70vh] -mt-10"
+        className="flex flex-col max-h-[40rem] -my-6 w-full md:max-w-[36rem]"
         checkout
       />
       <form
-        className="flex flex-col w-full max-w-screen-sm gap-y-9 mb-auto px-6 lg:px-0"
+        className="flex flex-col gap-y-9 px-6 w-full md:max-w-[32rem]"
         id="form"
         action={formAction}
       >
         <input
           type="text"
           name="name"
-          aria-label="name"
           autoComplete="on"
           required
           minLength={2}
           placeholder="Имя или название компании"
-          className="py-2 bg-inherit outline-none border-b rounded-none text-base xs:text-sm"
+          aria-label="Имя или название компании"
+          className="outline-none rounded-none text-base xs:text-sm border-b pb-1"
           autoCorrect="false"
           spellCheck="false"
           onInvalid={(e) => {
@@ -66,12 +65,12 @@ export default function Form({
         <input
           type="tel"
           name="phone"
-          aria-label="phone"
+          placeholder="Телефон для связи"
+          aria-label="Телефон для связи"
           autoComplete="on"
           required
           pattern="\+?[0-9]{6,}"
-          placeholder="Телефон для связи"
-          className="py-2 bg-inherit outline-none border-b rounded-none text-base xs:text-sm"
+          className="outline-none rounded-none text-base xs:text-sm border-b pb-1"
           autoCorrect="false"
           spellCheck="false"
           onInvalid={(e) => {
@@ -87,32 +86,27 @@ export default function Form({
         />
         <textarea
           name="description"
-          aria-label="description"
           maxLength={300}
           placeholder="Пожелания к заказу"
-          className="px-4 py-2 bg-inherit outline-none border rounded resize-none text-base xs:text-sm"
+          aria-label="Пожелания к заказу"
+          className="resize-none outline-none text-base xs:text-sm border border-t-0 border-l-0"
           rows={5}
           autoCorrect="false"
           spellCheck="false"
         />
         <Submit
-          pre={pre}
-          items={items}
           onClick={() => {
-            setClicked(clicked);
             const form = document.getElementById("form")!;
-            const bag = document.createElement("input");
-            bag.setAttribute("name", "bag");
-            bag.value = JSON.stringify(getBag(pre));
-            bag.style.display = "none";
-            form.appendChild(bag);
+            const inp = document.createElement("input");
+            inp.setAttribute("name", "bag");
+            inp.value = JSON.stringify(items);
+            inp.style.display = "none";
+            form.appendChild(inp);
           }}
         />
       </form>
     </>
-  ) : mount ? (
-    <p className="text-center w-full">В корзине ничего нет</p>
   ) : (
-    <p className="h-screen"></p>
+    <p className="m-auto text-base">В корзине ничего нет</p>
   );
 }

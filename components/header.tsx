@@ -1,10 +1,8 @@
+import { atteron } from "../app/fonts";
 import Link from "next/link";
-import { atteron } from "../fonts";
 import Menu from "./menu";
-import { getItemTypes } from "@/queries";
-
-// backend
-// label buttons w icons
+import { createClient } from "@/supabase";
+import { getItemGroups } from "@/queries";
 
 export default async function Header({
   layout,
@@ -13,12 +11,14 @@ export default async function Header({
 }) {
   return (
     <header
-      className={`fixed top-0 right-0 left-0 flex justify-between items-center bg-white p-6 2xl:px-12 shadow`}
+      className={`fixed top-0 right-0 left-0 flex justify-between items-center bg-white p-6 border-b z-10`}
     >
-      <h1 className={`${atteron.className} text-4xl tracking-widest z-10`}>
+      <h1 className={`${atteron.className} text-4xl tracking-widest`}>
         <Link href="/">vilari</Link>
       </h1>
-      {layout === "home" && <Menu itemTypes={await getItemTypes()} />}
+      {layout === "home" && (
+        <Menu itemGroups={await getItemGroups(createClient())} />
+      )}
     </header>
   );
 }

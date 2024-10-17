@@ -1,8 +1,9 @@
 "use client";
 
-import Link from "next/link";
+import BagSection from "../bag";
+import { useItems } from "@/app/hooks";
 import { BagIcon } from "../icons";
-import BagSection, { useItems } from "../bag";
+import Link from "next/link";
 
 export default function Bag({
   bag,
@@ -11,35 +12,34 @@ export default function Bag({
   bag: boolean;
   onClick: () => void;
 }) {
-  const items = useItems();
-  const className = "justify-between items-center w-10 z-10";
+  const items = useItems("order");
+  if (bag && !items.length) onClick();
   return (
     <>
-      <button
-        className={`${className} hidden md:flex`}
-        onClick={onClick}
-        aria-label="bag"
-      >
-        <BagIcon />
+      <div className="flex justify-between items-center w-10">
+        <button
+          className="hidden md:block z-10"
+          onClick={() => items.length && onClick()}
+          aria-label="bag"
+        >
+          <BagIcon />
+        </button>
+        <Link
+          href="/checkout"
+          className="md:hidden"
+          onClick={() => items.length && onClick()}
+          aria-label="checkout"
+        >
+          <BagIcon />
+        </Link>
         {items.reduce((total, item) => total + item.quantity, 0)}
-      </button>
-      <Link
-        href="/checkout"
-        className={`${className} flex md:hidden`}
-        onClick={() => (document.body.style.overflow = "auto")}
-        aria-label="checkout"
-      >
-        <BagIcon />
-        {items.reduce((total, item) => total + item.quantity, 0)}
-      </Link>
-      {bag && (
-        <BagSection
-          items={items}
-          className={`absolute right-0 top-16 mt-6 hidden ${
-            bag ? "md:flex" : ""
-          } flex-col w-full max-w-md max-h-[420px] shadow bg-white border-t`}
-        />
-      )}
+      </div>
+      <BagSection
+        items={items}
+        className={`${
+          bag ? "hidden md:flex" : "hidden"
+        } flex-col absolute top-16 mt-6 right-0 bg-white border border-r-0 w-[32rem] h-[20rem]`}
+      />
     </>
   );
 }

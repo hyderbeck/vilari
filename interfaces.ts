@@ -1,20 +1,59 @@
+interface Brand {
+  id: number;
+  name: string;
+  country: string;
+}
+interface Collection {
+  id: number;
+  name: string;
+  description?: string;
+  brand: number;
+}
+interface Material {
+  id: number;
+  name: string;
+  collections: number[];
+}
+
 export interface Item {
-  id: string;
+  id: number;
+  name: string;
+  brand: Brand;
+  collection?: Collection;
+  designer?: { id: number; name: string };
+  material: Material;
+  type: { id: number; name: string };
+  lwh: [number, number, number];
+  volume?: number;
+  weight?: number;
+  moysklad_id: string;
   price: number;
   quantity: number;
+  full_name: string;
+
+  amount?: number;
 }
 
-export interface ItemPreview extends Item {
+export interface ItemGroup {
+  id: number;
   name: string;
-  material: string;
-  size: string;
-  designer: { href: string; name: string };
-  collection: { href: string; name: string };
-  imageHref: string;
-  itemType: string;
-  stock: number;
+  department: number;
 }
 
-export interface ItemTypes {
-  [key: string]: { id: string; name: string }[];
+export interface Filters {
+  brands: Brand[];
+  collections: Collection[];
+  materials: Material[];
 }
+
+export type SearchParams = {
+  [key in
+    | "type"
+    | "search"
+    | "brands"
+    | "collections"
+    | "designers"
+    | "materials"
+    | "order"
+    | "limit"]?: string;
+};
