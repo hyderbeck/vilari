@@ -1,17 +1,52 @@
-import { ItemGroup, Item, SearchParams, Filters } from "./interfaces";
+import {
+  ItemGroup,
+  Item,
+  SearchParams,
+  Filters,
+  ItemVariant,
+} from "./interfaces";
 import { createClient } from "./supabase";
 
 export async function getItem(
   supabase: ReturnType<typeof createClient>,
   id: number
 ) {
-  const { data } = await supabase
+  const { data }: { data: Item[] | null } = await supabase
     .from("object")
     .select(
       `*, brand (*), collection (*), designer (*), material (*), type (*)`
     )
     .eq("id", id);
-  if (data?.length) return data[0] as Item;
+
+  if (data?.length) {
+    let item = data[0];
+    item.colors = (
+      await supabase.from("color").select().in("id", item.colors)
+    ).data!;
+    item.quantity = await getQuantity(item.moysklad_id);
+
+    const computedVariant: ItemVariant = {
+      material: item.material,
+      moysklad_id: item.moysklad_id,
+      price: item.price,
+      colors: item.colors,
+    };
+    item.variants = [computedVariant, ...(item.variants || [])];
+    for (const variant of item.variants.slice(1)) {
+      if (variant.colors) {
+        variant.colors = (
+          await supabase.from("color").select().in("id", variant.colors)
+        ).data!;
+      }
+      if (variant.material) {
+        variant.material = (
+          await supabase.from("material").select().eq("id", variant.material)
+        ).data![0];
+      }
+    }
+
+    return item;
+  }
 }
 
 export async function getItems(
@@ -20,9 +55,7 @@ export async function getItems(
 ) {
   let query = supabase
     .from("object")
-    .select(`*, brand (*), collection (*), type (*)`, {
-      count: "exact",
-    })
+    .select(`*, brand (*), collection (*), type (*)`, { count: "exact" })
     .order(searchParams.order ? "price" : "id", {
       ascending: searchParams.order === "desc" ? false : true,
     });
@@ -40,9 +73,12 @@ export async function getItems(
   if (searchParams.designers)
     query = query.in("designer", searchParams.designers.split(","));
 
-  const { data, count } = await query.limit(Number(searchParams.limit) || 10);
-  if (!data?.length) return;
-  return { items: data as Item[], count };
+  let { data, count }: { data: Item[] | null; count: number | null } =
+    await query.limit(Number(searchParams.limit) || 12);
+
+  if (data?.length) {
+    return { items: data, count };
+  }
 }
 
 export async function getItemGroups(supabase: ReturnType<typeof createClient>) {
@@ -74,6 +110,13 @@ export async function fetchData(endpoint: string, body?: Object) {
       body: JSON.stringify(body),
     })
   ).json();
+}
+
+async function getQuantity(id: string) {
+  const quantity = (
+    await fetchData(`assortment?filter=id=a6ef70e8-6c42-11ee-0a80-0d130035de38`)
+  ).rows[0].quantity;
+  return quantity;
 }
 
 export async function getCustomer(name: string, phone: string) {

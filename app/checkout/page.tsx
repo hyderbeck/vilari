@@ -31,7 +31,7 @@ async function placeOrder(_prevState: undefined | true, formData: FormData) {
     customer.bag.map((item) => {
       return {
         id: item.moysklad_id,
-        quantity: item.quantity,
+        quantity: item.amount || 0,
         price: item.price * 100,
       };
     }),

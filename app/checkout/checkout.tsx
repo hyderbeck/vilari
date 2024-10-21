@@ -27,18 +27,18 @@ export default function Checkout({
   }, [state, bag]);
 
   return state ? (
-    <p className="m-auto text-base">
+    <p className="m-auto">
       {bag === "order" ? "Заказ" : "Предзаказ"} оформлен!
     </p>
   ) : items.length ? (
     <>
       <Bag
         items={items}
-        className="flex flex-col max-h-[40rem] -my-6 w-full md:max-w-[36rem]"
+        className="flex flex-col max-h-[24rem] -my-6 md:max-w-[36rem]"
         checkout
       />
       <form
-        className="flex flex-col gap-y-9 px-6 w-full md:max-w-[32rem]"
+        className="flex flex-col h-[24rem] justify-between gap-y-9 px-6 w-full md:max-w-[32rem]"
         id="form"
         action={formAction}
       >
@@ -89,7 +89,7 @@ export default function Checkout({
           maxLength={300}
           placeholder="Пожелания к заказу"
           aria-label="Пожелания к заказу"
-          className="resize-none outline-none text-base xs:text-sm border border-t-0 border-l-0"
+          className="resize-none outline-none text-base xs:text-sm border border-t-0 border-l-0 rounded-br"
           rows={5}
           autoCorrect="false"
           spellCheck="false"
@@ -107,6 +107,6 @@ export default function Checkout({
       </form>
     </>
   ) : (
-    <p className="m-auto text-base">В корзине ничего нет</p>
+    <p className="m-auto">В корзине ничего нет</p>
   );
 }

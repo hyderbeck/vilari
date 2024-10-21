@@ -15,10 +15,10 @@ export default function Bag({
 }) {
   return (
     <section className={className}>
-      <div className="flex flex-col gap-y-6 p-6 pl-0 pb-0 overflow-y-scroll">
+      <div className="flex flex-col gap-y-6 p-6 pl-3 pb-0 overflow-y-scroll">
         {items.map((item) => (
           <Preview
-            key={item.id}
+            key={item.moysklad_id}
             item={item}
             page={checkout ? "checkout" : undefined}
           />
@@ -29,13 +29,13 @@ export default function Bag({
           <span>Итого</span>
           <span className="text-base">
             {items.reduce(
-              (total, item) => total + item.price * item.quantity,
+              (total, item) => total + item.price * item.amount!,
               0
             ) + " RUB"}
           </span>
         </p>
         {!checkout && (
-          <Link href="/checkout" className="btn mx-auto">
+          <Link scroll={false} href="/checkout" className="btn mx-auto">
             Оформить
           </Link>
         )}

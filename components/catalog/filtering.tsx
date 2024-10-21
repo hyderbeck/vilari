@@ -19,29 +19,33 @@ function FilterSet({
   const filterTypeDict = {
     brands: "Бренды",
     collections: "Коллекции",
-    materials: "Материалы",
+    materials: "Материал",
   };
   const [filterSet, setFilterSet] = useState(searchParams[filterType]);
   useEffect(() => {
     setFilterSet(searchParams[filterType]);
   }, [searchParams]);
   return (
-    <section className="flex flex-col gap-y-1.5">
+    <section className="flex flex-col gap-y-1">
       <h3>{filterTypeDict[filterType]}</h3>
-      <ul className="flex items-center" /**/>
+      <ul
+        className={`grid grid-cols-2 md:grid-cols-1 ${
+          filters[filterType].length > 5 ? "md:grid-cols-2" : ""
+        } gap-x-9 gap-y-1`}
+      >
         {filters[filterType].map((filter) => {
           const id = String(filter.id);
           const isIncluded = filterSet?.split(",").includes(id) || false;
           return (
             <li key={id}>
-              <label className="flex items-center gap-x-1.5 relative">
+              <label className="flex gap-x-1.5 relative">
                 <input
                   type="checkbox"
                   checked={isIncluded}
                   style={{
                     appearance: "none",
                   }}
-                  className="p-2 rounded bg-black"
+                  className="p-2 rounded bg-black h-fit"
                   onChange={() => {
                     if (!isIncluded) {
                       const filters = searchParams[filterType]
@@ -50,17 +54,19 @@ function FilterSet({
                       searchParams[filterType] = filters;
                       setFilterSet(filters);
                     } else {
-                      searchParams[filterType] = "";
-                      setFilterSet("");
+                      const arr = filterSet!.split(",");
+                      arr.splice(arr.indexOf(id), 1);
+                      searchParams[filterType] = arr.join(",");
+                      setFilterSet(arr.join(","));
                     }
                     replace(buildRef(searchParams));
                   }}
                 />
-                {filter.name}
+                <span className="leading-tight">{filter.name}</span>
                 <CheckIcon
                   className={`${
                     isIncluded ? "" : "hidden"
-                  } absolute left-[0.1rem] text-white`}
+                  } absolute left-[0.1rem] top-[0.1rem] text-white`}
                 />
               </label>
             </li>
@@ -77,19 +83,20 @@ export default function Filtering({ filters }: { filters: Filters }) {
   params.forEach(
     (value, key) => (searchParams[key as keyof SearchParams] = value)
   );
-  const [filterMenu, setFilterMenu] = useState(false);
+  const [filterMenu, setFilterMenu] = useState(true);
+
   return (
     <>
       <button
-        className="absolute top-[113px] md:hidden"
+        className="absolute top-[115px]"
         onClick={() => setFilterMenu(!filterMenu)}
       >
         <FiltersIcon />
       </button>
       <section
         className={`${
-          filterMenu ? "flex" : "hidden md:flex"
-        } flex-col -mt-6 md:-mt-0 gap-y-3 mb-12 md:mb-0 md:-mr-6 md:w-[24rem]`}
+          filterMenu ? "flex" : "hidden"
+        } flex-col md:flex-row -mt-6 gap-x-6 gap-y-6 justify-between`}
       >
         <FilterSet
           filters={filters}

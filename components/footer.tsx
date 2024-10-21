@@ -2,9 +2,10 @@ import { IGIcon, WAIcon } from "./icons";
 import { atteron } from "../app/fonts";
 
 export default function Footer() {
+  // bg-vlr-white bg-vlr-ptrn pt-72 md:pt-0
   return (
-    <footer className="bg-vlr-white bg-vlr-ptrn pt-72 md:pt-0">
-      <div className="bg-white md:w-[24rem] flex flex-col gap-y-6 p-6 mb-[9rem] md:mb-0 md:border-t">
+    <footer className="border-t">
+      <div className="bg-white md:w-[24rem] flex flex-col gap-y-6 p-6">
         <address className="not-italic flex flex-col gap-y-6">
           <div className="flex gap-x-3">
             <a href="https://instagram.com/vilari_mhk" target="_blank">

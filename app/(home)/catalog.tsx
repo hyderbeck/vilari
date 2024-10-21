@@ -14,25 +14,25 @@ export default async function Catalog({
   const supabase = createClient();
   const data = await getItems(supabase, searchParams);
 
-  return data?.items.length ? (
+  return (
     <>
       <section className="-mt-[23px] flex justify-between items-center">
-        <p className="hidden md:block">Нашлось: {data.count}</p>
+        {data && <p className="ml-12">Нашлось: {data.count}</p>}
         <Sorting />
       </section>
-      <div className="flex flex-col md:flex-row">
-        <Filtering filters={await getFilters(supabase)} />
-        <section className="flex justify-center md:-mt-6">
+      <Filtering filters={await getFilters(supabase)} />
+      {data?.items.length ? (
+        <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mx-auto gap-x-9 xs:gap-x-12 xl:gap-x-18 gap-y-6">
           {data.items.map((item) => (
-            <Preview key={item.id} item={item} page="home" />
+            <Preview key={item.moysklad_id} item={item} page="home" />
           ))}
         </section>
-      </div>
-      {(data.count || 0) > (Number(searchParams.limit) || 10) && (
-        <Load searchParams={searchParams} />
+      ) : (
+        <p className="m-auto">Ничего не найдено</p>
+      )}
+      {(data?.count || 0) > (Number(searchParams.limit) || 10) && (
+        <Load key={searchParams.limit} />
       )}
     </>
-  ) : (
-    <p className="m-auto text-base">Ничего не найдено</p>
   );
 }

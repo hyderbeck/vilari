@@ -10,7 +10,9 @@ function handleOrder(item: Item, items: Item[], i: number, add = true) {
   if (add) {
     if (!isAdded) {
       items.push(item);
-      i = items.findIndex(({ id }) => id == item.id);
+      i = items.findIndex(
+        ({ moysklad_id }) => moysklad_id === item.moysklad_id
+      );
       items[i].amount = 0;
     }
     items[i].amount!++;
@@ -36,7 +38,9 @@ export default function Add({
   page?: "home" | "checkout" | "item";
 }) {
   const items = useItems("order");
-  const i = items.findIndex(({ id }) => id === item.id);
+  const i = items.findIndex(
+    ({ moysklad_id }) => moysklad_id === item.moysklad_id
+  );
   const amount = i >= 0 ? items[i].amount : 0;
 
   return amount ? (

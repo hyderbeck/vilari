@@ -165,7 +165,7 @@ export function CheckIcon({ className }: { className?: string }) {
 export function Spinner({ className }: { className?: string }) {
   return (
     <svg
-      className={`${className} animate-spin w-4 -z-10`}
+      className={`${className} animate-spin w-4`}
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"

@@ -17,18 +17,19 @@ export default async function Page({
       </Main>
     );
 
+  const key =
+    (searchParams.search || "") +
+    searchParams.order +
+    searchParams.brands +
+    searchParams.collections +
+    searchParams.designers +
+    searchParams.materials +
+    searchParams.type;
+
   return (
-    <Main className="flex flex-col gap-y-12 px-6">
+    <Main className="flex flex-col gap-y-12 px-6 min-h-24">
       <Suspense
-        key={
-          searchParams.search ||
-          searchParams.type ||
-          searchParams.brands ||
-          searchParams.collections ||
-          searchParams.designers ||
-          searchParams.materials ||
-          searchParams.order
-        }
+        key={key}
         fallback={
           <>
             <Spinner className="m-auto" />

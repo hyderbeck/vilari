@@ -17,8 +17,8 @@ export default function Nav({
   onClick: () => void;
 }) {
   const departments = [
-    { id: 1, name: "Столовая посуда" },
-    { id: 2, name: "Чайная посуда" },
+    { id: 1, name: "Столовые предметы" },
+    { id: 2, name: "Чайные предметы" },
     { id: 3, name: "Декор" },
   ];
 
@@ -43,7 +43,7 @@ export default function Nav({
       >
         <NavIcon />
       </button>
-      <nav className="hidden md:flex gap-x-6 absolute top-9 left-[12.5rem] ">
+      <nav className="hidden md:flex gap-x-6 absolute top-9 left-[12.5rem]">
         {departments.map((department) => (
           <button
             key={department.id}
@@ -123,6 +123,12 @@ export default function Nav({
                 {department.name}
               </button>
             ))}
+      </nav>
+    </>
+  );
+}
+
+/*
         <Image
           alt="vilari"
           src="/logo.png"
@@ -130,7 +136,4 @@ export default function Nav({
           height={200}
           className="mt-auto xs:hidden md:block w-auto h-auto"
         />
-      </nav>
-    </>
-  );
-}
+*/

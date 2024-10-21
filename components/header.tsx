@@ -14,7 +14,9 @@ export default async function Header({
       className={`fixed top-0 right-0 left-0 flex justify-between items-center bg-white p-6 border-b z-10`}
     >
       <h1 className={`${atteron.className} text-4xl tracking-widest`}>
-        <Link href="/">vilari</Link>
+        <Link scroll={false} href="/">
+          vilari
+        </Link>
       </h1>
       {layout === "home" && (
         <Menu itemGroups={await getItemGroups(createClient())} />

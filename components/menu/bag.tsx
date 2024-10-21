@@ -4,6 +4,7 @@ import BagSection from "../bag";
 import { useItems } from "@/app/hooks";
 import { BagIcon } from "../icons";
 import Link from "next/link";
+import { useEffect } from "react";
 
 export default function Bag({
   bag,
@@ -13,7 +14,11 @@ export default function Bag({
   onClick: () => void;
 }) {
   const items = useItems("order");
-  if (bag && !items.length) onClick();
+  useEffect(() => {
+    if (bag && !items.length) {
+      onClick();
+    }
+  }, [items]);
   return (
     <>
       <div className="flex justify-between items-center w-10">
@@ -25,6 +30,7 @@ export default function Bag({
           <BagIcon />
         </button>
         <Link
+          scroll={false}
           href="/checkout"
           className="md:hidden"
           onClick={() => items.length && onClick()}
@@ -32,7 +38,7 @@ export default function Bag({
         >
           <BagIcon />
         </Link>
-        {items.reduce((total, item) => total + item.quantity, 0)}
+        {items.reduce((total, item) => total + item.amount!, 0)}
       </div>
       <BagSection
         items={items}
