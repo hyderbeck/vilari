@@ -3,31 +3,27 @@ interface Brand {
   name: string;
   country: string;
   description?: string;
+  categories: number[];
 }
 
 interface Collection {
   id: number;
   name: string;
   description?: string;
-  brand: number;
+  brand: number | Brand;
+  categories: number[];
 }
 
 interface Material {
   id: number;
   name: string;
   collections: number[];
+  categories: number[];
 }
 
 interface Color {
   id: number;
   name: string;
-}
-
-export interface ItemVariant {
-  material?: number | Material;
-  moysklad_id?: string;
-  price?: number;
-  colors?: Color[];
 }
 
 export interface Item {
@@ -37,21 +33,25 @@ export interface Item {
   collection?: Collection;
   designer?: { id: number; name: string };
   material: Material;
-  type: { id: number; name: string };
+  category: { id: number; name: string; single?: string };
   colors: Color[];
-  lwh: [number, number, number];
+  lwh: number[];
   volume?: number;
   weight?: number;
-  moysklad_id: string;
+  wms_id: string;
   price: number;
-  object_name?: string;
-  variants?: ItemVariant[];
-  quantity?: number;
+  item_name?: string;
+  variants?: number[];
+  quantity: number;
+  collab?: {
+    col: "brand" | "collection";
+    val: Brand | Collection;
+  };
 
   amount?: number;
 }
 
-export interface ItemGroup {
+export interface Category {
   id: number;
   name: string;
   department: number;
@@ -65,12 +65,13 @@ export interface Filters {
 
 export type SearchParams = {
   [key in
-    | "type"
+    | "category"
     | "search"
     | "brands"
     | "collections"
     | "designers"
     | "materials"
     | "order"
-    | "limit"]?: string;
+    | "limit"
+    | "secret"]?: string;
 };

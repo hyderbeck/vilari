@@ -27,7 +27,7 @@ export default function Sorting() {
         className="btn h-7 outline-none ml-auto w-40"
         defaultValue={searchParams.order || "new"}
       >
-        <option value="new">Сначала новые</option>
+        <option value="new">По умолчанию</option>
         <option value="desc">Сначала дороже</option>
         <option value="asc">Сначала дешевле</option>
       </select>

@@ -3,8 +3,8 @@ import { SearchParams } from "./interfaces";
 export function buildRef(searchParams: SearchParams) {
   let ref = "/";
   let delim = "?";
-  if (searchParams.type) {
-    ref += delim + `type=${searchParams.type}`;
+  if (searchParams.category) {
+    ref += delim + `category=${searchParams.category}`;
     delim = "&";
   } else if (searchParams.search) {
     ref += delim + `search=${searchParams.search}`;
@@ -22,4 +22,8 @@ export function buildRef(searchParams: SearchParams) {
   if (searchParams.order) ref += delim + `order=${searchParams.order}`;
   if (searchParams.limit) ref += delim + `limit=${searchParams.limit}`;
   return ref;
+}
+
+export function fmtPrice(price: number) {
+  return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " ₽";
 }

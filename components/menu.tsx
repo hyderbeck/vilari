@@ -3,10 +3,10 @@
 import Search from "./menu/search";
 import Nav from "./menu/nav";
 import Bag from "./menu/bag";
-import { ItemGroup } from "@/interfaces";
+import { Category } from "@/interfaces";
 import { useState } from "react";
 
-export default function Menu({ itemGroups }: { itemGroups: ItemGroup[] }) {
+export default function Menu({ categories }: { categories: Category[] }) {
   const [search, setSearch] = useState(false);
   const [nav, setNav] = useState(false);
   const [bag, setBag] = useState(false);
@@ -37,7 +37,7 @@ export default function Menu({ itemGroups }: { itemGroups: ItemGroup[] }) {
       <Nav
         nav={nav}
         onClick={() => handleClick("nav")}
-        itemGroups={itemGroups}
+        categories={categories}
       />
     </section>
   );

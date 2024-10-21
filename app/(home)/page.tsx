@@ -10,9 +10,9 @@ export default async function Page({
 }: {
   searchParams: SearchParams;
 }) {
-  if (!(searchParams.type || searchParams.search))
+  if (!(searchParams.category || searchParams.search))
     return (
-      <Main className="flex flex-col justify-center items-center">
+      <Main className="flex flex-col justify-center items-center gap-y-12">
         <Home />
       </Main>
     );
@@ -24,7 +24,7 @@ export default async function Page({
     searchParams.collections +
     searchParams.designers +
     searchParams.materials +
-    searchParams.type;
+    searchParams.category;
 
   return (
     <Main className="flex flex-col gap-y-12 px-6 min-h-24">

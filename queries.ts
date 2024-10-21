@@ -1,10 +1,4 @@
-import {
-  ItemGroup,
-  Item,
-  SearchParams,
-  Filters,
-  ItemVariant,
-} from "./interfaces";
+import { Category, Item, SearchParams, Filters } from "./interfaces";
 import { createClient } from "./supabase";
 
 export async function getItem(
@@ -12,38 +6,25 @@ export async function getItem(
   id: number
 ) {
   const { data }: { data: Item[] | null } = await supabase
-    .from("object")
+    .from("items")
     .select(
-      `*, brand (*), collection (*), designer (*), material (*), type (*)`
+      `*, brand (*), collection (*), designer (*), material (*), category (*)`
     )
     .eq("id", id);
 
   if (data?.length) {
     let item = data[0];
-    item.colors = (
-      await supabase.from("color").select().in("id", item.colors)
-    ).data!;
-    item.quantity = await getQuantity(item.moysklad_id);
 
-    const computedVariant: ItemVariant = {
-      material: item.material,
-      moysklad_id: item.moysklad_id,
-      price: item.price,
-      colors: item.colors,
-    };
-    item.variants = [computedVariant, ...(item.variants || [])];
-    for (const variant of item.variants.slice(1)) {
-      if (variant.colors) {
-        variant.colors = (
-          await supabase.from("color").select().in("id", variant.colors)
-        ).data!;
-      }
-      if (variant.material) {
-        variant.material = (
-          await supabase.from("material").select().eq("id", variant.material)
-        ).data![0];
+    if (item.colors) {
+      const colors = (
+        await supabase.from("colors").select().in("id", item.colors)
+      ).data!;
+      for (let i = 0; i < item.colors.length; i++) {
+        item.colors[i] = colors.find((color) => color.id === item.colors[i]);
       }
     }
+
+    item.quantity = await getQuantity(item.wms_id);
 
     return item;
   }
@@ -54,20 +35,23 @@ export async function getItems(
   searchParams: SearchParams
 ) {
   let query = supabase
-    .from("object")
-    .select(`*, brand (*), collection (*), type (*)`, { count: "exact" })
-    .order(searchParams.order ? "price" : "id", {
+    .from("items")
+    .select(`*, brand (*), collection (*), category (*)`, { count: "exact" })
+    .order("in_stock", { ascending: false })
+    .order(searchParams.order ? "price" : "name", {
       ascending: searchParams.order === "desc" ? false : true,
     });
   if (searchParams.search)
-    query = query.ilike("full_name", `%${searchParams.search}%`);
-  if (searchParams.type && searchParams.type !== "all")
-    query = query.eq("type", searchParams.type);
+    query = query.ilike("name", `%${searchParams.search}%`);
+  if (searchParams.category && searchParams.category !== "all")
+    query = query.eq("category", searchParams.category);
 
-  if (searchParams.brands)
+  if (searchParams.brands) {
     query = query.in("brand", searchParams.brands.split(","));
-  if (searchParams.collections)
+  }
+  if (searchParams.collections) {
     query = query.in("collection", searchParams.collections.split(","));
+  }
   if (searchParams.materials)
     query = query.in("material", searchParams.materials.split(","));
   if (searchParams.designers)
@@ -81,22 +65,22 @@ export async function getItems(
   }
 }
 
-export async function getItemGroups(supabase: ReturnType<typeof createClient>) {
-  const { data } = await supabase.from("type").select();
-  return data as ItemGroup[];
+export async function getCategories(supabase: ReturnType<typeof createClient>) {
+  const { data } = await supabase.from("categories").select();
+  return data as Category[];
 }
 
 export async function getFilters(supabase: ReturnType<typeof createClient>) {
   return {
-    brands: (await supabase.from("brand").select()).data,
-    collections: (await supabase.from("collection").select()).data,
-    materials: (await supabase.from("material").select()).data,
+    brands: (await supabase.from("brands").select()).data,
+    collections: (await supabase.from("collections").select()).data,
+    materials: (await supabase.from("materials").select()).data,
   } as Filters;
 }
 
-export async function fetchData(endpoint: string, body?: Object) {
+export async function fetchData(endpoint: string, body?: {}) {
   const auth =
-    "Basic " + Buffer.from(process.env.CREDENTIALS!).toString("base64");
+    "Basic " + Buffer.from(process.env.MOYSKLAD_CREDS!).toString("base64");
   return await (
     await fetch(`https://api.moysklad.ru/api/remap/1.2/entity/${endpoint}`, {
       method: body ? "POST" : "GET",
@@ -112,11 +96,9 @@ export async function fetchData(endpoint: string, body?: Object) {
   ).json();
 }
 
-async function getQuantity(id: string) {
-  const quantity = (
-    await fetchData(`assortment?filter=id=a6ef70e8-6c42-11ee-0a80-0d130035de38`)
-  ).rows[0].quantity;
-  return quantity;
+export async function getQuantity(id: string) {
+  if (!id) return 0;
+  return (await fetchData(`assortment?filter=id=${id}`)).rows[0].quantity;
 }
 
 export async function getCustomer(name: string, phone: string) {
@@ -133,12 +115,12 @@ export async function getCustomer(name: string, phone: string) {
 export async function createOrder(
   customerId: string,
   bag: { id: string; quantity: number; price: number }[],
-  description: string
+  description?: string
 ) {
   return await fetchData("customerorder", {
     organization: {
       meta: {
-        href: `https://api.moysklad.ru/api/remap/1.2/entity/organization/${process.env.ORGANIZATION}`,
+        href: `https://api.moysklad.ru/api/remap/1.2/entity/organization/${process.env.MOYSKLAD_ID}`,
         type: "organization",
       },
     },
@@ -162,4 +144,15 @@ export async function createOrder(
     }),
     description,
   });
+}
+
+export async function preorder(
+  supabase: ReturnType<typeof createClient>,
+  customer: string,
+  item: string,
+  description: string | null
+) {
+  return await supabase
+    .from("preorders")
+    .insert({ customer, item, description });
 }

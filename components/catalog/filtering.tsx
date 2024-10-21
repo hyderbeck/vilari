@@ -19,20 +19,34 @@ function FilterSet({
   const filterTypeDict = {
     brands: "Бренды",
     collections: "Коллекции",
-    materials: "Материал",
+    materials: "Материалы",
   };
   const [filterSet, setFilterSet] = useState(searchParams[filterType]);
   useEffect(() => {
     setFilterSet(searchParams[filterType]);
-  }, [searchParams]);
+  }, [searchParams, filterType]);
+
+  if (searchParams.category && searchParams.category !== "all") {
+    filters[filterType] = filters[filterType].filter((f) =>
+      f.categories.includes(Number(searchParams.category))
+    ) as any;
+  }
+
+  if (filterType === "collections") {
+    filters[filterType] = filters[filterType].filter((f) => {
+      if (!searchParams.brands) return false;
+      return searchParams.brands.split(",").includes(String(f.brand));
+    });
+  }
+
+  filters[filterType].sort((a, b) => a.name.localeCompare(b.name));
+
+  if (!filters[filterType].length) return;
+
   return (
-    <section className="flex flex-col gap-y-1">
+    <section className="flex flex-col gap-y-3">
       <h3>{filterTypeDict[filterType]}</h3>
-      <ul
-        className={`grid grid-cols-2 md:grid-cols-1 ${
-          filters[filterType].length > 5 ? "md:grid-cols-2" : ""
-        } gap-x-9 gap-y-1`}
-      >
+      <ul className={`grid grid-cols-2 md:grid-cols-1 gap-x-9 gap-y-1.5`}>
         {filters[filterType].map((filter) => {
           const id = String(filter.id);
           const isIncluded = filterSet?.split(",").includes(id) || false;
@@ -59,6 +73,14 @@ function FilterSet({
                       searchParams[filterType] = arr.join(",");
                       setFilterSet(arr.join(","));
                     }
+                    if ("brand" in filter) {
+                      searchParams.brands = String(filter.brand);
+                      searchParams.materials = undefined;
+                    } else if (filterType === "materials") {
+                      searchParams.collections = undefined;
+                    } else if (filterType === "brands") {
+                      searchParams.collections = undefined;
+                    }
                     replace(buildRef(searchParams));
                   }}
                 />
@@ -83,7 +105,7 @@ export default function Filtering({ filters }: { filters: Filters }) {
   params.forEach(
     (value, key) => (searchParams[key as keyof SearchParams] = value)
   );
-  const [filterMenu, setFilterMenu] = useState(true);
+  const [filterMenu, setFilterMenu] = useState(false);
 
   return (
     <>
@@ -96,7 +118,7 @@ export default function Filtering({ filters }: { filters: Filters }) {
       <section
         className={`${
           filterMenu ? "flex" : "hidden"
-        } flex-col md:flex-row -mt-6 gap-x-6 gap-y-6 justify-between`}
+        } flex-col md:flex-row gap-x-24 gap-y-6 -mt-6`}
       >
         <FilterSet
           filters={filters}

@@ -4,14 +4,20 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "storage.files.mow1.cloud.servers.ru",
-        port: "8080",
-      },
-      {
-        protocol: "https",
         hostname: "rzpcucgkjsqqedurowkl.supabase.co",
       },
     ],
+  },
+  async redirects() {
+    return [
+      {
+        source: "/cms",
+        destination: `http://192.168.1.158:4000/item?secret=${Buffer.from(
+          process.env.ADMIN_SECRET
+        ).toString("base64")}`,
+        permanent: true,
+      },
+    ];
   },
 };
 

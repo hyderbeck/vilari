@@ -18,7 +18,7 @@ export default function Bag({
     if (bag && !items.length) {
       onClick();
     }
-  }, [items]);
+  }, [items, bag, onClick]);
   return (
     <>
       <div className="flex justify-between items-center w-10">

@@ -1,34 +1,49 @@
-import Image from "next/image";
+import Carousel from "@/components/carousel";
 
-const itemGroups = ["Столовая посуда", "Чайная посуда", "Декор"];
-const brands = ["seletti"];
-
-export default function Home() {
+export default async function Home() {
   return (
     <>
-      <section className="flex w-full h-[250px] border -mt-12 mb-12">
-        Banner
-      </section>
-      <section className="flex w-full flex-col gap-y-12">
-        {itemGroups.map((group) => (
-          <div key={group} className="border h-[250px]">
-            {group}
-          </div>
-        ))}
-      </section>
-      <section className="flex w-full px-6 -mb-12">
-        {brands.map((brand) => (
-          <div key={brand} className="relative w-32 aspect-square">
-            <Image
-              alt={brand}
-              src={`/logos/${brand}.jpg`}
-              fill={true}
-              sizes={"8rem"}
-              className="object-contain"
-            />
-          </div>
-        ))}
-      </section>
+      <Carousel />
     </>
   );
 }
+
+/*
+import Image from "next/image";
+import Link from "next/link";
+
+function Department({
+  department,
+  image,
+}: {
+  department: string;
+  image: number;
+}) {
+  return (
+    <div className="flex flex-col items-center">
+      <Image alt="" src={`/home/${image}.jpg`} width="500" height="500" />
+    </div>
+  );
+}
+  
+import Preview from "@/components/preview";
+import { getItem } from "@/queries";
+import { createClient } from "@/supabase";
+
+const supabase = createClient();
+const items = [80];
+const item = await getItem(
+  supabase,
+  items[Math.floor(Math.random() * items.length)]
+);
+
+<section className="-mt-12 flex gap-x-12 justify-around items-center w-full pb-12">
+  <Preview item={item!} page="home" welcome />
+</section>
+
+
+      <section className="-mt-12 flex flex-col md:flex-row justify-center w-full">
+        <Department department="Столовые предметы" image={1} />
+      </section>
+
+*/

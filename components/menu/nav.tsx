@@ -1,18 +1,18 @@
 "use client";
 
-import { ItemGroup } from "@/interfaces";
+import { Category } from "@/interfaces";
 import { NavIcon } from "../icons";
 import Link from "next/link";
-import Image from "next/image";
+// import Image from "next/image";
 import { useState } from "react";
 import { buildRef } from "@/utils";
 
 export default function Nav({
-  itemGroups,
+  categories,
   nav,
   onClick,
 }: {
-  itemGroups: ItemGroup[];
+  categories: Category[];
   nav: boolean;
   onClick: () => void;
 }) {
@@ -22,21 +22,23 @@ export default function Nav({
     { id: 3, name: "Декор" },
   ];
 
-  const [group, setGroup] = useState(0);
+  const [department, setDepartment] = useState(0);
 
-  let groups: ItemGroup[] = [];
+  let itemTypes: Category[] = [];
 
-  if (!nav && group) {
-    setGroup(0);
+  if (!nav && department) {
+    setDepartment(0);
   } else {
-    groups = itemGroups.filter((itemGroup) => itemGroup.department === group);
+    itemTypes = categories.filter(
+      (category) => category.department === department
+    );
   }
   return (
     <>
       <button
         className="md:hidden z-10"
         onClick={() => {
-          setGroup(0);
+          setDepartment(0);
           onClick();
         }}
         aria-label="nav"
@@ -44,38 +46,40 @@ export default function Nav({
         <NavIcon />
       </button>
       <nav className="hidden md:flex gap-x-6 absolute top-9 left-[12.5rem]">
-        {departments.map((department) => (
+        {departments.map((departm) => (
           <button
-            key={department.id}
+            key={departm.id}
             onClick={() => {
-              setGroup(department.id);
-              (!nav || group === department.id) && onClick();
+              setDepartment(departm.id);
+              (!nav || department === departm.id) && onClick();
             }}
           >
-            {department.name}
+            {departm.name}
           </button>
         ))}
         <section
           className={`${
-            nav ? "flex" : "hidden"
-          } flex flex-col fixed top-16 mt-6 p-6 right-0 left-0 bg-white border-t border-b`}
+            nav ? "grid" : "hidden"
+          } grid grid-cols-3 fixed top-16 mt-6 p-6 right-0 left-0 bg-white border-t border-b`}
         >
-          {groups.map((itemGroup) => {
-            const ref = buildRef({
-              type: String(itemGroup.id),
-            });
-            return (
-              <Link
-                key={itemGroup.id}
-                replace
-                href={ref}
-                className="w-fit"
-                onClick={onClick}
-              >
-                {itemGroup.name}
-              </Link>
-            );
-          })}
+          {itemTypes
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .map((itemType) => {
+              const ref = buildRef({
+                category: String(itemType.id),
+              });
+              return (
+                <Link
+                  key={itemType.id}
+                  replace
+                  href={ref}
+                  className="w-fit"
+                  onClick={onClick}
+                >
+                  {itemType.name}
+                </Link>
+              );
+            })}
         </section>
       </nav>
       <nav
@@ -83,42 +87,44 @@ export default function Nav({
           nav ? "flex md:hidden" : "hidden"
         } flex-col items-center fixed top-16 mt-6 py-6 right-0 bottom-0 left-0 bg-white border-t`}
       >
-        {group ? (
-          <button onClick={() => setGroup(0)} className="text-base mb-3">
+        {department ? (
+          <button onClick={() => setDepartment(0)} className="text-base mb-3">
             {"<<"}
           </button>
         ) : (
           <Link
             replace
-            href="/?type=all"
+            href="/?category=all"
             className="text-base mb-3"
             onClick={onClick}
           >
             Всё
           </Link>
         )}
-        {group
-          ? groups.map((itemGroup) => {
-              const ref = buildRef({
-                type: String(itemGroup.id),
-              });
-              return (
-                <Link
-                  key={itemGroup.id}
-                  replace
-                  href={ref}
-                  className="text-base md:text-sm"
-                  onClick={onClick}
-                >
-                  {itemGroup.name}
-                </Link>
-              );
-            })
+        {department
+          ? itemTypes
+              .sort((a, b) => a.name.localeCompare(b.name))
+              .map((itemType) => {
+                const ref = buildRef({
+                  category: String(itemType.id),
+                });
+                return (
+                  <Link
+                    key={itemType.id}
+                    replace
+                    href={ref}
+                    className="text-base md:text-sm"
+                    onClick={onClick}
+                  >
+                    {itemType.name}
+                  </Link>
+                );
+              })
           : departments.map((department) => (
               <button
                 key={department.id}
                 className="text-base md:text-sm"
-                onClick={() => setGroup(department.id)}
+                onClick={() => setDepartment(department.id)}
               >
                 {department.name}
               </button>

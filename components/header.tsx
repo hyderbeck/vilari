@@ -2,7 +2,7 @@ import { atteron } from "../app/fonts";
 import Link from "next/link";
 import Menu from "./menu";
 import { createClient } from "@/supabase";
-import { getItemGroups } from "@/queries";
+import { getCategories } from "@/queries";
 
 export default async function Header({
   layout,
@@ -19,7 +19,7 @@ export default async function Header({
         </Link>
       </h1>
       {layout === "home" && (
-        <Menu itemGroups={await getItemGroups(createClient())} />
+        <Menu categories={await getCategories(createClient())} />
       )}
     </header>
   );

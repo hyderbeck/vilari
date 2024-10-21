@@ -32,7 +32,7 @@ export default function Search({
             const search = e.target.value.trim();
             const ref = buildRef({
               search,
-              type: !search ? "all" : "",
+              category: !search ? "all" : "",
             });
             replace(ref);
           }}

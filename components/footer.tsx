@@ -2,7 +2,6 @@ import { IGIcon, WAIcon } from "./icons";
 import { atteron } from "../app/fonts";
 
 export default function Footer() {
-  // bg-vlr-white bg-vlr-ptrn pt-72 md:pt-0
   return (
     <footer className="border-t">
       <div className="bg-white md:w-[24rem] flex flex-col gap-y-6 p-6">
