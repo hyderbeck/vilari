@@ -5,11 +5,11 @@ import { Main } from "@/components/skeleton";
 
 export default async function Page({ params }: { params: { item: number } }) {
   return (
-    <Main>
+    <Main className="flex justify-center items-center">
       <Suspense
         fallback={
           <>
-            <Spinner className="m-auto" />
+            <Spinner />
           </>
         }
       >

@@ -57,25 +57,27 @@ export default function Nav({
         ))}
         <section
           className={`${
-            nav ? "flex" : "hidden"
-          } flex flex-col fixed top-16 mt-6 p-6 right-0 left-0 bg-white border-t border-b`}
+            nav ? "grid" : "hidden"
+          } grid grid-cols-3 fixed top-16 mt-6 p-6 right-0 left-0 bg-white border-t border-b`}
         >
-          {groups.map((itemGroup) => {
-            const ref = buildRef({
-              type: String(itemGroup.id),
-            });
-            return (
-              <Link
-                key={itemGroup.id}
-                replace
-                href={ref}
-                className="w-fit"
-                onClick={onClick}
-              >
-                {itemGroup.name}
-              </Link>
-            );
-          })}
+          {groups
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .map((itemGroup) => {
+              const ref = buildRef({
+                type: String(itemGroup.id),
+              });
+              return (
+                <Link
+                  key={itemGroup.id}
+                  replace
+                  href={ref}
+                  className="w-fit"
+                  onClick={onClick}
+                >
+                  {itemGroup.name}
+                </Link>
+              );
+            })}
         </section>
       </nav>
       <nav
@@ -98,22 +100,24 @@ export default function Nav({
           </Link>
         )}
         {group
-          ? groups.map((itemGroup) => {
-              const ref = buildRef({
-                type: String(itemGroup.id),
-              });
-              return (
-                <Link
-                  key={itemGroup.id}
-                  replace
-                  href={ref}
-                  className="text-base md:text-sm"
-                  onClick={onClick}
-                >
-                  {itemGroup.name}
-                </Link>
-              );
-            })
+          ? groups
+              .sort((a, b) => a.name.localeCompare(b.name))
+              .map((itemGroup) => {
+                const ref = buildRef({
+                  type: String(itemGroup.id),
+                });
+                return (
+                  <Link
+                    key={itemGroup.id}
+                    replace
+                    href={ref}
+                    className="text-base md:text-sm"
+                    onClick={onClick}
+                  >
+                    {itemGroup.name}
+                  </Link>
+                );
+              })
           : departments.map((department) => (
               <button
                 key={department.id}

@@ -28,6 +28,7 @@ export interface ItemVariant {
   moysklad_id?: string;
   price?: number;
   colors?: Color[];
+  object_name?: string;
 }
 
 export interface Item {
@@ -37,9 +38,9 @@ export interface Item {
   collection?: Collection;
   designer?: { id: number; name: string };
   material: Material;
-  type: { id: number; name: string };
+  type: { id: number; name: string; singular?: string };
   colors: Color[];
-  lwh: [number, number, number];
+  lwh: number[];
   volume?: number;
   weight?: number;
   moysklad_id: string;
@@ -47,6 +48,10 @@ export interface Item {
   object_name?: string;
   variants?: ItemVariant[];
   quantity?: number;
+  collab?: {
+    col: "brand" | "collection";
+    val: Brand | Collection;
+  };
 
   amount?: number;
 }

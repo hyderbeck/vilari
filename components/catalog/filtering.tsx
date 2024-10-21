@@ -33,45 +33,47 @@ function FilterSet({
           filters[filterType].length > 5 ? "md:grid-cols-2" : ""
         } gap-x-9 gap-y-1`}
       >
-        {filters[filterType].map((filter) => {
-          const id = String(filter.id);
-          const isIncluded = filterSet?.split(",").includes(id) || false;
-          return (
-            <li key={id}>
-              <label className="flex gap-x-1.5 relative">
-                <input
-                  type="checkbox"
-                  checked={isIncluded}
-                  style={{
-                    appearance: "none",
-                  }}
-                  className="p-2 rounded bg-black h-fit"
-                  onChange={() => {
-                    if (!isIncluded) {
-                      const filters = searchParams[filterType]
-                        ? searchParams[filterType] + "," + id
-                        : id;
-                      searchParams[filterType] = filters;
-                      setFilterSet(filters);
-                    } else {
-                      const arr = filterSet!.split(",");
-                      arr.splice(arr.indexOf(id), 1);
-                      searchParams[filterType] = arr.join(",");
-                      setFilterSet(arr.join(","));
-                    }
-                    replace(buildRef(searchParams));
-                  }}
-                />
-                <span className="leading-tight">{filter.name}</span>
-                <CheckIcon
-                  className={`${
-                    isIncluded ? "" : "hidden"
-                  } absolute left-[0.1rem] top-[0.1rem] text-white`}
-                />
-              </label>
-            </li>
-          );
-        })}
+        {filters[filterType]
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .map((filter) => {
+            const id = String(filter.id);
+            const isIncluded = filterSet?.split(",").includes(id) || false;
+            return (
+              <li key={id}>
+                <label className="flex gap-x-1.5 relative">
+                  <input
+                    type="checkbox"
+                    checked={isIncluded}
+                    style={{
+                      appearance: "none",
+                    }}
+                    className="p-2 rounded bg-black h-fit"
+                    onChange={() => {
+                      if (!isIncluded) {
+                        const filters = searchParams[filterType]
+                          ? searchParams[filterType] + "," + id
+                          : id;
+                        searchParams[filterType] = filters;
+                        setFilterSet(filters);
+                      } else {
+                        const arr = filterSet!.split(",");
+                        arr.splice(arr.indexOf(id), 1);
+                        searchParams[filterType] = arr.join(",");
+                        setFilterSet(arr.join(","));
+                      }
+                      replace(buildRef(searchParams));
+                    }}
+                  />
+                  <span className="leading-tight">{filter.name}</span>
+                  <CheckIcon
+                    className={`${
+                      isIncluded ? "" : "hidden"
+                    } absolute left-[0.1rem] top-[0.1rem] text-white`}
+                  />
+                </label>
+              </li>
+            );
+          })}
       </ul>
     </section>
   );

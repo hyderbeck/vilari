@@ -23,7 +23,9 @@ function formatName(item: Item) {
   return (
     groupName +
     " " +
-    item.collection!.name.toUpperCase() +
+    (item.collection && item.collection.name !== "Villari Classics"
+      ? item.collection.name.toUpperCase()
+      : "") +
     (item.object_name ? " " + item.object_name.toUpperCase() : "")
   );
 }
@@ -31,9 +33,9 @@ function formatName(item: Item) {
 function formatDescription({ item }: { item: Item }) {
   const description =
     item.collection?.description
-      ?.replaceAll("-", "—")
+      ?.replaceAll(" - ", " — ")
       .split(item.collection.name) ||
-    item.brand.description?.replaceAll("-", "—").split(item.brand.name);
+    item.brand.description?.replaceAll(" - ", " — ").split(item.brand.name);
   if (description) {
     const which = item.collection?.description ? "collection" : "brand";
     const id = item.collection?.description
@@ -66,7 +68,28 @@ function formatDescription({ item }: { item: Item }) {
   }
 }
 
-function formatWLH() {}
+function formatLwh(lwh: number[]) {
+  function format(lwh: number[]) {
+    let d = 0;
+    if (lwh[0] === lwh[1]) d = lwh[0];
+    return d
+      ? "⌀ " + d + " см" + (lwh[2] ? " h " + lwh[2] + " см" : "")
+      : lwh[0] +
+          " см x " +
+          lwh[1] +
+          " см" +
+          (lwh[2] ? " см x " + lwh[2] + " см" : "");
+  }
+
+  return lwh.length > 3 ? (
+    <>
+      <span>{format(lwh)}</span>
+      <span>{format(lwh.slice(3))}</span>
+    </>
+  ) : (
+    <span>{format(lwh)}</span>
+  );
+}
 
 export default function Preview({
   item,
@@ -84,7 +107,7 @@ export default function Preview({
 
   let folder = variants ? variant + 1 : 0;
 
-  if (page === "item") {
+  if (page === "item" && variants) {
     Object.entries(variants![variant]).forEach(
       (kv) => ((item[kv[0] as keyof Item] as any) = kv[1])
     );
@@ -107,11 +130,9 @@ export default function Preview({
     volume,
     weight,
     price,
-    object_name,
     quantity,
+    collab,
   } = item;
-
-  const name = formatName(item);
 
   let d = 0;
   if (lwh[0] === lwh[1]) d = lwh[0];
@@ -130,7 +151,7 @@ export default function Preview({
     >
       <div
         className={
-          page === "item" && variants!.length > 1
+          page === "item" && variants
             ? "flex items-center flex-col lg:flex-row-reverse shrink-0 w-full max-w-screen-xs mx-auto md:w-[24rem] md:-mr-6 lg:w-auto lg:mx-0 lg:ml-3"
             : "flex items-center shrink-0"
         }
@@ -150,9 +171,7 @@ export default function Preview({
               ? "w-[150px] xs:w-[215px] xl:w-[260px] mb-3"
               : page === "item"
               ? `w-[350px] ${
-                  variants!.length > 1
-                    ? "mr-auto md:mr-0"
-                    : "mx-auto md:mx-0 md:ml-6"
+                  variants ? "mr-auto md:mr-0" : "mx-auto md:mx-0 md:ml-6"
                 }`
               : page === "checkout"
               ? "w-[125px] xs:w-[150px]"
@@ -160,7 +179,7 @@ export default function Preview({
           } aspect-square`}
         />
         {page === "item" &&
-          variants!.length > 1 &&
+          variants &&
           (spinner ? (
             <div className="hover:cursor-pointer w-[125px] aspect-square mb-6 md:mb-0 ml-auto mr-3 md:mr-0 md:ml-0 bg-white flex justify-center">
               <Spinner />
@@ -214,10 +233,10 @@ export default function Preview({
           <div>
             {page === "item" ? (
               <h2 className="text-2xl font-extralight tracking-normal">
-                {name}
+                {formatName(item)}
               </h2>
             ) : (
-              <Link href={`/${id}`}>{name}</Link>
+              <Link href={`/${id}`}>{formatName(item)}</Link>
             )}
             {collection && page !== "item" && (
               <>
@@ -228,6 +247,18 @@ export default function Preview({
                 >
                   {collection.name}
                 </Link>
+                {collab && collab.col === "collection" && (
+                  <>
+                    {" "}
+                    <span className="font-extralight">x</span>{" "}
+                    <Link
+                      href={`/?type=all&collections=${collab.val.id}`}
+                      className="font-extralight"
+                    >
+                      {collab.val.name}
+                    </Link>
+                  </>
+                )}
               </>
             )}
           </div>
@@ -253,7 +284,6 @@ export default function Preview({
         </div>
         {page === "item" && (
           <p className="flex flex-col">
-            {object_name && <span>{object_name}</span>}
             <span>
               Бренд:{" "}
               <Link
@@ -273,6 +303,17 @@ export default function Preview({
                 >
                   {collection.name}
                 </Link>
+                {collab && collab.col === "collection" && (
+                  <>
+                    <span className="underline underline-offset-4"> x </span>
+                    <Link
+                      href={`/?type=all&collections=${collab.val.id}`}
+                      className="underline underline-offset-4"
+                    >
+                      {collab.val.name}
+                    </Link>
+                  </>
+                )}
               </span>
             )}
             {designer && (
@@ -287,7 +328,9 @@ export default function Preview({
               </span>
             )}
             <span>Материал: {material.name}</span>
-            <span>Цвет: {colors.map((color) => color.name).join(" / ")}</span>
+            {colors && (
+              <span>Цвет: {colors.map((color) => color.name).join(" / ")}</span>
+            )}
             <span>
               Категория:{" "}
               <Link
@@ -297,15 +340,7 @@ export default function Preview({
                 {type.name}
               </Link>
             </span>
-            <span>
-              {d
-                ? "⌀ " + d + " см" + (lwh[2] ? " h " + lwh[2] + " см" : "")
-                : lwh[0] +
-                  " см x " +
-                  lwh[1] +
-                  " см" +
-                  (lwh[2] ? " см x " + lwh[2] + " см" : "")}
-            </span>
+            {formatLwh(lwh)}
             {volume && <span>{volume}</span>}
             {weight && <span>{weight}</span>}
           </p>

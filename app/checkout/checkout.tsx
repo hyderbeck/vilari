@@ -97,11 +97,18 @@ export default function Checkout({
         <Submit
           onClick={() => {
             const form = document.getElementById("form")!;
-            const inp = document.createElement("input");
-            inp.setAttribute("name", "bag");
-            inp.value = JSON.stringify(items);
-            inp.style.display = "none";
-            form.appendChild(inp);
+
+            const orderInput = document.createElement("input");
+            orderInput.setAttribute("name", "bag");
+            orderInput.value = JSON.stringify(items);
+            orderInput.style.display = "none";
+            form.appendChild(orderInput);
+
+            const orderTypeInput = document.createElement("input");
+            orderTypeInput.setAttribute("name", "orderType");
+            orderTypeInput.value = bag;
+            orderTypeInput.style.display = "none";
+            form.appendChild(orderTypeInput);
           }}
         />
       </form>

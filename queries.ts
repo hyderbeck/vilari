@@ -20,28 +20,44 @@ export async function getItem(
 
   if (data?.length) {
     let item = data[0];
-    item.colors = (
-      await supabase.from("color").select().in("id", item.colors)
-    ).data!;
+
+    if (item.colors) {
+      const colors = (
+        await supabase.from("color").select().in("id", item.colors)
+      ).data!;
+      for (let i = 0; i < item.colors.length; i++) {
+        item.colors[i] = colors.find((color) => color.id === item.colors[i]);
+      }
+    }
+
     item.quantity = await getQuantity(item.moysklad_id);
 
-    const computedVariant: ItemVariant = {
-      material: item.material,
-      moysklad_id: item.moysklad_id,
-      price: item.price,
-      colors: item.colors,
-    };
-    item.variants = [computedVariant, ...(item.variants || [])];
-    for (const variant of item.variants.slice(1)) {
-      if (variant.colors) {
-        variant.colors = (
-          await supabase.from("color").select().in("id", variant.colors)
-        ).data!;
-      }
-      if (variant.material) {
-        variant.material = (
-          await supabase.from("material").select().eq("id", variant.material)
-        ).data![0];
+    if (item.variants) {
+      const computedVariant: ItemVariant = {
+        material: item.material,
+        moysklad_id: item.moysklad_id,
+        price: item.price,
+        colors: item.colors,
+        object_name: item.object_name,
+      };
+      item.variants = [computedVariant, ...(item.variants || [])];
+      for (const variant of item.variants.slice(1)) {
+        if (variant.colors) {
+          const colors = (
+            await supabase.from("color").select().in("id", variant.colors)
+          ).data!;
+          for (let i = 0; i < item.colors.length; i++) {
+            variant.colors[i] = colors.find(
+              (color) => color.id === variant.colors![i]
+            );
+          }
+        }
+
+        if (variant.material) {
+          variant.material = (
+            await supabase.from("material").select().eq("id", variant.material)
+          ).data![0];
+        }
       }
     }
 
@@ -56,18 +72,23 @@ export async function getItems(
   let query = supabase
     .from("object")
     .select(`*, brand (*), collection (*), type (*)`, { count: "exact" })
-    .order(searchParams.order ? "price" : "id", {
+    .order(searchParams.order ? "price" : "name", {
       ascending: searchParams.order === "desc" ? false : true,
     });
   if (searchParams.search)
-    query = query.ilike("full_name", `%${searchParams.search}%`);
+    query = query.ilike("name", `%${searchParams.search}%`);
   if (searchParams.type && searchParams.type !== "all")
     query = query.eq("type", searchParams.type);
 
   if (searchParams.brands)
     query = query.in("brand", searchParams.brands.split(","));
-  if (searchParams.collections)
-    query = query.in("collection", searchParams.collections.split(","));
+  if (searchParams.collections) {
+    query = query.or(
+      `collection.in.(${searchParams.collections}), collab->val->>id.in.(${searchParams.collections})`
+    );
+    //in("collection", searchParams.collections.split(","));
+    //query = query.in("collab->val->>id", searchParams.collections.split(","));
+  }
   if (searchParams.materials)
     query = query.in("material", searchParams.materials.split(","));
   if (searchParams.designers)
@@ -77,6 +98,9 @@ export async function getItems(
     await query.limit(Number(searchParams.limit) || 12);
 
   if (data?.length) {
+    //for (const item of data) {
+    //  item.quantity = await getQuantity(item.moysklad_id);
+    //}
     return { items: data, count };
   }
 }
@@ -96,7 +120,7 @@ export async function getFilters(supabase: ReturnType<typeof createClient>) {
 
 export async function fetchData(endpoint: string, body?: Object) {
   const auth =
-    "Basic " + Buffer.from(process.env.CREDENTIALS!).toString("base64");
+    "Basic " + Buffer.from(process.env.MOYSKLAD_CREDS!).toString("base64");
   return await (
     await fetch(`https://api.moysklad.ru/api/remap/1.2/entity/${endpoint}`, {
       method: body ? "POST" : "GET",
@@ -113,10 +137,7 @@ export async function fetchData(endpoint: string, body?: Object) {
 }
 
 async function getQuantity(id: string) {
-  const quantity = (
-    await fetchData(`assortment?filter=id=a6ef70e8-6c42-11ee-0a80-0d130035de38`)
-  ).rows[0].quantity;
-  return quantity;
+  return (await fetchData(`assortment?filter=id=${id}`)).rows[0].quantity;
 }
 
 export async function getCustomer(name: string, phone: string) {
@@ -133,12 +154,12 @@ export async function getCustomer(name: string, phone: string) {
 export async function createOrder(
   customerId: string,
   bag: { id: string; quantity: number; price: number }[],
-  description: string
+  description?: string
 ) {
   return await fetchData("customerorder", {
     organization: {
       meta: {
-        href: `https://api.moysklad.ru/api/remap/1.2/entity/organization/${process.env.ORGANIZATION}`,
+        href: `https://api.moysklad.ru/api/remap/1.2/entity/organization/${process.env.MOYSKLAD_ID}`,
         type: "organization",
       },
     },
@@ -162,4 +183,15 @@ export async function createOrder(
     }),
     description,
   });
+}
+
+export async function preorder(
+  supabase: ReturnType<typeof createClient>,
+  customer: string,
+  object: string,
+  description: string | null
+) {
+  return await supabase
+    .from("preorder")
+    .insert({ customer, object, description });
 }
