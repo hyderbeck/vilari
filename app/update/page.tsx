@@ -1,5 +1,5 @@
 import { Item } from "@/interfaces";
-import { getQuantity } from "@/queries";
+import { getQuantity, getPrice } from "@/queries";
 import { createClient } from "@supabase/supabase-js";
 import { redirect } from "next/navigation";
 
@@ -31,31 +31,39 @@ async function updateQuantities(supabase: ReturnType<typeof createAdmin>) {
 }
 
 async function updateFilters(supabase: ReturnType<typeof createAdmin>) {
-  async function updateFilter(
-    supabase: ReturnType<typeof createAdmin>,
-    filter: "brands" | "collections" | "materials"
-  ) {
+  async function updateFilter(filter: "brands" | "collections" | "materials") {
     const ids = (await supabase.from(filter).select("id")).data!;
+
     for (const { id } of ids) {
       const data = (
-        await supabase.from("items").select("category").eq(filter, id)
+        await supabase
+          .from("items")
+          .select("category")
+          .eq(filter.slice(0, filter.length - 1), id)
       ).data!;
+
       const categories: number[] = [];
       for (const { category } of data) {
         if (!categories.includes(category)) {
           categories.push(category);
         }
       }
-      const { error } = await supabase
-        .from(filter)
-        .update({ categories })
-        .eq("id", id);
-      if (error) console.log(error);
+
+      await supabase.from(filter).update({ categories }).eq("id", id);
     }
   }
-  await updateFilter(supabase, "brands");
-  await updateFilter(supabase, "collections");
-  await updateFilter(supabase, "materials");
+  await updateFilter("brands");
+  await updateFilter("collections");
+  await updateFilter("materials");
+}
+
+async function updatePrices(supabase: ReturnType<typeof createAdmin>) {
+  const { data } = await supabase.from("items").select();
+
+  for (const item of data! as Item[]) {
+    const price = await getPrice(item.wms_id);
+    await supabase.from("items").update({ price }).eq("id", item.id);
+  }
 }
 
 export default async function Update({
@@ -65,6 +73,7 @@ export default async function Update({
 }) {
   if (searchParams.secret !== process.env.ADMIN_SECRET) redirect("/");
   const supabase = createAdmin();
-  await updateQuantities(supabase);
-  await updateFilters(supabase);
+  // await updateQuantities(supabase);
+  // await updateFilters(supabase);
+  // await updatePrices(supabase);
 }

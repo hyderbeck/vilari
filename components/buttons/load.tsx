@@ -3,26 +3,21 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Spinner } from "../icons";
-import { buildRef } from "@/utils";
-import { SearchParams } from "@/interfaces";
-import { useSearchParams } from "next/navigation";
+import { formatRef } from "@/app/utils";
+import { useSearchParams } from "@/app/hooks";
 
-export default function Load() {
+export default function Load({ className }: { className: string }) {
   const params = useSearchParams();
-  const searchParams: SearchParams = {};
-  params.forEach(
-    (value, key) => (searchParams[key as keyof SearchParams] = value)
-  );
+  params.limit = String(Number(params.limit || 12) + 12);
 
   const [loading, setLoading] = useState(false);
-  searchParams.limit = String(Number(searchParams.limit || 12) + 12);
-  const ref = buildRef(searchParams);
+
   return (
     <Link
       replace
-      href={ref}
+      href={formatRef(params)}
       scroll={false}
-      className="btn mx-auto"
+      className={`btn ${className}`}
       onClick={() => {
         setLoading(true);
       }}

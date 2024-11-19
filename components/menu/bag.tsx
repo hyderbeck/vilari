@@ -1,8 +1,8 @@
 "use client";
 
 import BagSection from "../bag";
-import { useItems } from "@/app/hooks";
-import { BagIcon } from "../icons";
+import { useBag } from "@/app/hooks";
+import { Bag as BagIcon } from "../icons";
 import Link from "next/link";
 import { useEffect } from "react";
 
@@ -13,12 +13,13 @@ export default function Bag({
   bag: boolean;
   onClick: () => void;
 }) {
-  const items = useItems("order");
+  const items = useBag("order");
   useEffect(() => {
     if (bag && !items.length) {
       onClick();
     }
   }, [items, bag, onClick]);
+
   return (
     <>
       <div className="flex justify-between items-center w-10">
@@ -27,7 +28,7 @@ export default function Bag({
           onClick={() => items.length && onClick()}
           aria-label="bag"
         >
-          <BagIcon />
+          <BagIcon className="size-6 flex" />
         </button>
         <Link
           scroll={false}
@@ -36,7 +37,7 @@ export default function Bag({
           onClick={() => items.length && onClick()}
           aria-label="checkout"
         >
-          <BagIcon />
+          <BagIcon className="size-6 flex" />
         </Link>
         {items.reduce((total, item) => total + item.amount!, 0)}
       </div>

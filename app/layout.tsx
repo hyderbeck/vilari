@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import { inter } from "./fonts";
 import "./globals.css";
 import Footer from "@/components/footer";
+import { title } from "@/app/constants";
 
 export const metadata: Metadata = {
-  title: "Vilari",
-  description: "Посуда и декор от Seletti, Bitossi, ИФЗ и других брендов",
+  metadataBase: new URL("https://vilari.vercel.com"),
+  title: title + "Посуда и декор от Seletti, Bitossi, ИФЗ и других брендов",
 };
 
 export default function RootLayout({

@@ -1,4 +1,11 @@
-import { Category, Item, SearchParams, Filters } from "./interfaces";
+import {
+  Category,
+  Item,
+  SearchParams,
+  Brand,
+  Collection,
+  Material,
+} from "./interfaces";
 import { createClient } from "./supabase";
 
 export async function getItem(
@@ -13,7 +20,7 @@ export async function getItem(
     .eq("id", id);
 
   if (data?.length) {
-    let item = data[0];
+    const item = data[0];
 
     if (item.colors) {
       const colors = (
@@ -23,8 +30,6 @@ export async function getItem(
         item.colors[i] = colors.find((color) => color.id === item.colors[i]);
       }
     }
-
-    item.quantity = await getQuantity(item.wms_id);
 
     return item;
   }
@@ -36,16 +41,42 @@ export async function getItems(
 ) {
   let query = supabase
     .from("items")
-    .select(`*, brand (*), collection (*), category (*)`, { count: "exact" })
+    .select(`*, brand(*), collection(*), category!inner(*)`, {
+      count: "exact",
+    })
     .order("in_stock", { ascending: false })
-    .order(searchParams.order ? "price" : "name", {
+    .order(searchParams.order ? "price" : "full_name", {
       ascending: searchParams.order === "desc" ? false : true,
     });
-  if (searchParams.search)
-    query = query.ilike("name", `%${searchParams.search}%`);
-  if (searchParams.category && searchParams.category !== "all")
-    query = query.eq("category", searchParams.category);
-
+  if (searchParams.search) {
+    /*
+    const search = searchParams.search
+      .split(" ")
+      .map((word) => "'" + word + "'")
+      .join(" & ");
+    query = query.textSearch("full_name", `${search}`);
+    */
+    query = query.ilike("full_name", `%${searchParams.search}%`);
+  }
+  if (searchParams.category && searchParams.category !== "all") {
+    switch (searchParams.category) {
+      case "tableware":
+        query = query.eq("category.department", 1);
+        break;
+      case "teaware":
+        query = query.eq("category.department", 2);
+        break;
+      case "decor":
+        query = query.eq("category.department", 3);
+        break;
+      default:
+        const categories = searchParams.category.split(",");
+        query =
+          categories.length > 1
+            ? query.in("category", categories) // the same thing?
+            : query.eq("category", searchParams.category);
+    }
+  }
   if (searchParams.brands) {
     query = query.in("brand", searchParams.brands.split(","));
   }
@@ -57,7 +88,7 @@ export async function getItems(
   if (searchParams.designers)
     query = query.in("designer", searchParams.designers.split(","));
 
-  let { data, count }: { data: Item[] | null; count: number | null } =
+  const { data, count }: { data: Item[] | null; count: number | null } =
     await query.limit(Number(searchParams.limit) || 12);
 
   if (data?.length) {
@@ -72,35 +103,35 @@ export async function getCategories(supabase: ReturnType<typeof createClient>) {
 
 export async function getFilters(supabase: ReturnType<typeof createClient>) {
   return {
-    brands: (await supabase.from("brands").select()).data,
-    collections: (await supabase.from("collections").select()).data,
-    materials: (await supabase.from("materials").select()).data,
-  } as Filters;
+    brands: (await supabase.from("brands").select()).data as Brand[],
+    collections: (await supabase.from("collections").select())
+      .data as Collection[],
+    materials: (await supabase.from("materials").select()).data as Material[],
+  };
 }
 
-export async function fetchData(endpoint: string, body?: {}) {
+export async function fetchData(endpoint: string, body?: {}, entity = true) {
   const auth =
     "Basic " + Buffer.from(process.env.MOYSKLAD_CREDS!).toString("base64");
   return await (
-    await fetch(`https://api.moysklad.ru/api/remap/1.2/entity/${endpoint}`, {
-      method: body ? "POST" : "GET",
-      headers: body
-        ? {
-            Authorization: auth,
-            "Accept-Encoding": "gzip",
-            "Content-Type": "application/json",
-          }
-        : { Authorization: auth },
-      body: JSON.stringify(body),
-    })
+    await fetch(
+      `https://api.moysklad.ru/api/remap/1.2/${
+        entity ? `entity/${endpoint}` : endpoint
+      }`,
+      {
+        method: body ? "POST" : "GET",
+        headers: body
+          ? {
+              Authorization: auth,
+              "Accept-Encoding": "gzip",
+              "Content-Type": "application/json",
+            }
+          : { Authorization: auth },
+        body: JSON.stringify(body),
+      }
+    )
   ).json();
 }
-
-export async function getQuantity(id: string) {
-  if (!id) return 0;
-  return (await fetchData(`assortment?filter=id=${id}`)).rows[0].quantity;
-}
-
 export async function getCustomer(name: string, phone: string) {
   let customer = (
     await fetchData(`counterparty?filter=phone~${phone.slice(2)}`)
@@ -111,13 +142,27 @@ export async function getCustomer(name: string, phone: string) {
     await fetchData("counterparty", { name, phone, companyType: "individual" })
   ).id as string;
 }
-
+export async function getQuantity(id: string) {
+  if (!id) return 0;
+  return (await fetchData(`assortment?filter=id=${id}`)).rows[0].quantity;
+}
+export async function getPrice(id: string) {
+  return (
+    (await fetchData(`assortment?filter=id=${id}`)).rows[0].salePrices[0]
+      .value / 100
+  );
+}
 export async function createOrder(
   customerId: string,
   bag: { id: string; quantity: number; price: number }[],
   description?: string
 ) {
+  const orders = (await fetchData("customerorder?order=created")).rows;
+  const lastOrder = orders[orders.length - 1].name as string;
+  const name =
+    String(Number(lastOrder.slice(0, lastOrder.length - 1)) + 1) + "C";
   return await fetchData("customerorder", {
+    name,
     organization: {
       meta: {
         href: `https://api.moysklad.ru/api/remap/1.2/entity/organization/${process.env.MOYSKLAD_ID}`,
@@ -144,15 +189,4 @@ export async function createOrder(
     }),
     description,
   });
-}
-
-export async function preorder(
-  supabase: ReturnType<typeof createClient>,
-  customer: string,
-  item: string,
-  description: string | null
-) {
-  return await supabase
-    .from("preorders")
-    .insert({ customer, item, description });
 }

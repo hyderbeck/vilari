@@ -6,12 +6,7 @@
   .btn {
     @apply flex justify-around items-center font-normal bg-black text-white rounded min-w-24 min-h-7 gap-x-1.5 px-1.5;
   }
+  .underlined {
+    @apply underline underline-offset-4;
+  }
 }
-
-/*
-
-:root {
-  -- -
-}
-
-*/

@@ -1,77 +1,58 @@
-interface Brand {
+interface Field {
   id: number;
   name: string;
+}
+export interface Category extends Field {
+  department: number;
+  single?: string;
+}
+export interface Brand extends Field {
   country: string;
   description?: string;
   categories: number[];
 }
-
-interface Collection {
-  id: number;
-  name: string;
-  description?: string;
+export interface Collection extends Field {
   brand: number | Brand;
+  description?: string;
   categories: number[];
 }
-
-interface Material {
-  id: number;
-  name: string;
+export interface Material extends Field {
   collections: number[];
   categories: number[];
 }
-
-interface Color {
-  id: number;
-  name: string;
-}
-
-export interface Item {
-  id: number;
-  name: string;
-  brand: Brand;
-  collection?: Collection;
-  designer?: { id: number; name: string };
-  material: Material;
-  category: { id: number; name: string; single?: string };
-  colors: Color[];
-  lwh: number[];
-  volume?: number;
-  weight?: number;
+export interface OrderItem extends Field {
+  brand: Field;
+  collection?: Field;
+  quantity: number;
   wms_id: string;
   price: number;
-  item_name?: string;
-  variants?: number[];
-  quantity: number;
-  collab?: {
-    col: "brand" | "collection";
-    val: Brand | Collection;
-  };
-
-  amount?: number;
+  amount: number;
+  single: string;
 }
-
-export interface Category {
-  id: number;
-  name: string;
-  department: number;
+export interface Item
+  extends Omit<OrderItem, "brand" | "collection" | "amount"> {
+  brand: Brand;
+  collection?: Collection;
+  designer: Field;
+  material: Material;
+  category: Category;
+  colors: Field[];
+  lwh: number[];
+  volume?: number;
+  tag?: string;
 }
+export type Page = "home" | "checkout" | "item";
 
-export interface Filters {
-  brands: Brand[];
-  collections: Collection[];
-  materials: Material[];
-}
+export type Order = "order" | "pre";
 
 export type SearchParams = {
   [key in
     | "category"
     | "search"
+    | "limit"
+    | "order"
     | "brands"
     | "collections"
-    | "designers"
     | "materials"
-    | "order"
-    | "limit"
-    | "secret"]?: string;
+    | "designers"]?: string;
 };

@@ -1,55 +1,20 @@
 "use client";
 
-import { Item } from "@/interfaces";
+import { Item, OrderItem } from "@/interfaces";
 import Add from "./buttons/add";
 import Image from "next/image";
 import Link from "next/link";
-import { fmtPrice } from "@/utils";
-
-function formatName(item: Item) {
-  let itemName = item.name
-    .replace(item.collection?.name || "", "")
-    .replace(item.item_name || "", "")
-    .replace(item.brand.name, "")
-    .trim();
-  return itemName + (item.item_name ? " " + item.item_name.toUpperCase() : "");
-}
+import { formatPrice, formatName } from "@/app/utils";
+import { ReactNode } from "react";
+import Back from "./buttons/back";
+import { Edit } from "./buttons/cms";
 
 function formatDescription({ item }: { item: Item }) {
   const description =
-    item.collection?.description
-      ?.replaceAll(" - ", " — ")
-      .split(item.collection.name) ||
-    item.brand.description?.replaceAll(" - ", " — ").split(item.brand.name);
+    item.collection?.description?.replaceAll(" - ", " — ") ||
+    item.brand.description?.replaceAll(" - ", " — ");
   if (description) {
-    const which = item.collection?.description ? "collection" : "brand";
-    const id = item.collection?.description
-      ? item.collection.id
-      : item.brand.id;
-    const name = item.collection?.description
-      ? item.collection.name
-      : item.brand.name;
-    return (
-      <p className="mt-6 border-t pt-6">
-        {description.map((s, i) => {
-          return (
-            <span key={i}>
-              {s}
-              {i < description.length - 1 ? (
-                <Link
-                  href={`/?category=all&${which}s=${id}`}
-                  className="underline underline-offset-4"
-                >
-                  {name}
-                </Link>
-              ) : (
-                ""
-              )}
-            </span>
-          );
-        })}
-      </p>
-    );
+    return <p className="mt-6 border-t pt-6">{description}</p>;
   }
 }
 
@@ -77,14 +42,36 @@ function formatLwh(lwh?: number[]) {
   );
 }
 
+function ItemLink({
+  id,
+  children,
+  isLink,
+}: {
+  id: number;
+  children: ReactNode;
+  isLink?: boolean;
+}) {
+  return isLink ? (
+    <Link href={`${id}`} className="hover:cursor-default">
+      {children}
+    </Link>
+  ) : (
+    <>{children}</>
+  );
+}
+
 export default function Preview({
   item,
   page,
   welcome,
+  isAdmin,
+  referer,
 }: {
-  item: Item;
+  item: Item | OrderItem;
   page?: "home" | "checkout" | "item";
   welcome?: true;
+  isAdmin?: boolean;
+  referer?: boolean;
 }) {
   const {
     id,
@@ -98,40 +85,52 @@ export default function Preview({
     price,
     quantity,
     volume,
-  } = item;
+  } = item as Item;
 
   return (
     <article
       className={`flex ${
         page === "home"
           ? `${
-              welcome ? "w-[350px]" : "w-[150px] xs:w-[215px] xl:w-[260px]"
+              welcome
+                ? "w-full px-6 xs:px-0 xs:w-[215px] mx-auto h-full"
+                : "w-[150px] xs:w-[215px] xl:w-[260px]"
             } flex-col`
           : page === "item"
           ? "flex-col md:flex-row w-full justify-center items-center md:items-start gap-x-12"
           : page === "checkout"
-          ? "pb-6 gap-x-6"
-          : "justify-between pb-6 gap-x-6"
+          ? "gap-x-6"
+          : "justify-between gap-x-6"
       }`}
     >
-      <Image
-        alt="item"
-        src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/objects/${id}/1.jpeg`}
-        width={350}
-        height={350}
-        quality={100}
-        className={`${
-          page === "home"
-            ? `${
-                welcome ? "w-[350px]" : "w-[150px] xs:w-[215px] xl:w-[260px]"
-              } mb-3`
-            : page === "item"
-            ? `w-[350px] mx-auto md:mx-0 md:ml-6 md:mt-24`
-            : page === "checkout"
-            ? "w-[100px] xs:w-[150px]"
-            : "w-[125px] xs:w-[150px]"
-        } aspect-square`}
-      />
+      {page === "item" && referer && (
+        <Back className="w-fit absolute top-0 left-[1.5rem]" />
+      )}
+      {isAdmin && (
+        <Edit id={id} className="w-fit min-w-0 absolute top-0 right-[1.5rem]" />
+      )}
+      <ItemLink id={id} isLink={page !== "item"}>
+        <Image
+          alt="item"
+          src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/objects/${id}/1.jpeg`}
+          width={350}
+          height={350}
+          quality={100}
+          className={`${
+            page === "home"
+              ? `${
+                  welcome
+                    ? "w-full xs:w-[215px]"
+                    : "w-[150px] xs:w-[215px] xl:w-[260px]"
+                } mb-3`
+              : page === "item"
+              ? `w-[350px] mx-auto md:mx-0 md:ml-6 md:mt-24`
+              : page === "checkout"
+              ? "w-[100px] xs:w-[150px]"
+              : "w-[125px] xs:w-[150px]"
+          } aspect-square`}
+        />
+      </ItemLink>
       <div
         className={`flex ${
           page === "home"
@@ -160,9 +159,11 @@ export default function Preview({
           </Link>
           <div>
             {page === "item" ? (
-              <h3 className="text-2xl font-extralight ">{formatName(item)}</h3>
+              <h3 className="text-2xl font-extralight ">
+                {formatName(item as Item)}
+              </h3>
             ) : (
-              <Link href={`/${id}`}>{formatName(item)}</Link>
+              <Link href={`/${id}`}>{formatName(item as Item)}</Link>
             )}
             {collection && page !== "item" && (
               <>
@@ -202,7 +203,7 @@ export default function Preview({
               page === "checkout" ? "text-end" : "text-center"
             } xs:text-end`}
           >
-            {fmtPrice(price)}
+            {formatPrice(price)}
           </p>
         </div>
         {page === "item" && (
@@ -256,7 +257,7 @@ export default function Preview({
             {volume && <span>{volume} мл</span>}
           </p>
         )}
-        {page === "item" && formatDescription({ item })}
+        {page === "item" && formatDescription({ item } as { item: Item })}
       </div>
     </article>
   );

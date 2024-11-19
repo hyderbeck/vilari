@@ -8,14 +8,22 @@ export function Main({
   children: ReactNode;
   className?: string;
 }) {
-  return <main className={`${className} mt-[8.5rem] flex-1`}>{children}</main>;
+  return <main className={className}>{children}</main>;
 }
 
-export default function Skeleton({ children }: { children: ReactNode }) {
+export function Skeleton({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
   return (
     <>
-      <Header />
-      <Main className="flex justify-center items-center">{children}</Main>
+      <Header className="fixed top-0 right-0 left-0 z-10" />
+      <Main className={`flex justify-center items-center ${className}`}>
+        {children}
+      </Main>
     </>
   );
 }

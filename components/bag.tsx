@@ -1,8 +1,8 @@
 "use client";
 
 import Preview from "./preview";
-import { Item } from "@/interfaces";
-import { fmtPrice } from "@/utils";
+import { OrderItem } from "@/interfaces";
+import { formatPrice } from "@/app/utils";
 import Link from "next/link";
 
 export default function Bag({
@@ -10,13 +10,17 @@ export default function Bag({
   className,
   checkout = false,
 }: {
-  items: Item[];
+  items: OrderItem[];
   className: string;
   checkout?: boolean;
 }) {
   return (
-    <section className={className}>
-      <div className="flex flex-col gap-y-6 p-6 pl-3 pb-0 overflow-y-scroll">
+    <article className={className}>
+      <div
+        className={`flex flex-col gap-y-6 p-6 overflow-y-scroll ${
+          checkout ? "pt-[7.5rem] gap-y-9" : ""
+        }`}
+      >
         {items.map((item) => (
           <Preview
             key={item.id}
@@ -29,7 +33,7 @@ export default function Bag({
         <p className="flex justify-between items-center pt-6 border-t w-full">
           <span>Итого</span>
           <span className="text-base">
-            {fmtPrice(
+            {formatPrice(
               items.reduce(
                 (total, item) => total + item.price * item.amount!,
                 0
@@ -43,6 +47,6 @@ export default function Bag({
           </Link>
         )}
       </footer>
-    </section>
+    </article>
   );
 }
