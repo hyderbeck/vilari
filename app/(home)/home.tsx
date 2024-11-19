@@ -1,49 +1,36 @@
-import Carousel from "@/components/carousel";
+import { Items, Logos } from "@/components/home/carousels";
+// import Nav from "@/components/home/nav";
+import { getTaggedItems } from "@/queries";
+import { createClient } from "@/supabase";
+// import Link from "next/link";
 
 export default async function Home() {
+  const items = await getTaggedItems(createClient(), "pick");
   return (
     <>
-      <Carousel />
+      {items && (
+        <>
+          <section className="flex justify-between w-full -mb-9 px-6 mt-28"></section>
+          <Items items={items} />
+        </>
+      )}
+      <Logos />
     </>
   );
 }
 
 /*
-import Image from "next/image";
-import Link from "next/link";
 
-function Department({
-  department,
-  image,
-}: {
-  department: string;
-  image: number;
-}) {
-  return (
-    <div className="flex flex-col items-center">
-      <Image alt="" src={`/home/${image}.jpg`} width="500" height="500" />
-    </div>
-  );
-}
-  
-import Preview from "@/components/preview";
-import { getItem } from "@/queries";
-import { createClient } from "@/supabase";
+            <h2> </h2>
+            <Link
+              href={`/?category=all`}
+              className="underline underline-offset-4"
+            >
+              Смотреть всё
+            </Link>
 
-const supabase = createClient();
-const items = [80];
-const item = await getItem(
-  supabase,
-  items[Math.floor(Math.random() * items.length)]
-);
-
-<section className="-mt-12 flex gap-x-12 justify-around items-center w-full pb-12">
-  <Preview item={item!} page="home" welcome />
-</section>
-
-
-      <section className="-mt-12 flex flex-col md:flex-row justify-center w-full">
-        <Department department="Столовые предметы" image={1} />
-      </section>
+      <div className="bg-vlr-white bg-vlr-ptrn bg-top w-full h-[175px]"></div>
+      <div className="bg-vlr-white bg-vlr-ptrn bg-center w-full h-[50px] -mt-9"></div>
+      <div className="bg-vlr-white bg-vlr-ptrn bg-bottom w-full h-[10px] -mt-9"></div>
 
 */

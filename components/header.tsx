@@ -21,6 +21,7 @@ export default async function Header({
       {layout === "home" && (
         <Menu categories={await getCategories(createClient())} />
       )}
+      {layout === "checkout" && <h2>Оформление заказа</h2>}
     </header>
   );
 }

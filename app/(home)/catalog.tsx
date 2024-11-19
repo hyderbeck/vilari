@@ -6,6 +6,7 @@ import Sorting from "@/components/catalog/sorting";
 import { SearchParams } from "@/interfaces";
 import Filtering from "@/components/catalog/filtering";
 import { Create } from "@/components/buttons/cms";
+import { departments } from "@/utils";
 
 export default async function Catalog({
   searchParams,
@@ -14,18 +15,43 @@ export default async function Catalog({
 }) {
   const supabase = createClient();
   const data = await getItems(supabase, searchParams);
-  /*
-  const category =
-    searchParams.search || searchParams.category === "all"
-      ? "all"
-      : (await supabase.from("categories").select().eq("id", searchParams.category))
-          .data![0].name;
 
-  const s = searchParams.search;
-  */
+  let category = "";
+  let department = "Все категории";
+
+  if (!(searchParams.search || searchParams.category === "all")) {
+    if (
+      ["tableware", "teaware", "decor"].includes(searchParams.category ?? "")
+    ) {
+      department = departments.find(
+        (d) => d.param === searchParams.category
+      )!.name;
+    } else if (searchParams.category === "6,7,11") {
+      category = "Кружки и чашки";
+      department = "Чайные предметы";
+    } else {
+      const { data } = await supabase
+        .from("categories")
+        .select("*, department(name)")
+        .eq("id", searchParams.category);
+      if (data?.length) {
+        category = data[0].name;
+        department = data[0].department.name;
+      }
+    }
+  }
+
   return (
     <>
-      <section className="-mt-[23px] flex justify-between items-center">
+      {category ? (
+        <h2 className="mb-3">
+          <span>{department} / </span>
+          <span className="text-base">{category}</span>
+        </h2>
+      ) : (
+        <h2 className="mb-3">{department}</h2>
+      )}
+      <section className="flex justify-between items-center">
         {data && <p className="ml-12">Нашлось: {data.count}</p>}
         <Sorting />
       </section>

@@ -5,6 +5,7 @@ import { useItems } from "@/app/hooks";
 import { useEffect } from "react";
 import { useFormState } from "react-dom";
 import Submit from "@/components/buttons/submit";
+import Link from "next/link";
 
 export default function Checkout({
   placeOrderAction,
@@ -28,19 +29,24 @@ export default function Checkout({
   }, [state, bag]);
 
   return state ? (
-    <p className="m-auto">
-      {bag === "order" ? "Заказ" : "Предзаказ"} оформлен! Мы свяжемся с вами в
-      ближайшее время.
-    </p>
+    <div className="m-auto flex flex-col items-center gap-y-3 pt-32">
+      <p>
+        {bag === "order" ? "Заказ" : "Предзаказ"} оформлен! Мы свяжемся с вами в
+        ближайшее время.
+      </p>
+      <Link href="/?category=all" className="underline underline-offset-4">
+        Продолжить покупки
+      </Link>
+    </div>
   ) : items.length ? (
     <>
       <Bag
         items={items}
-        className="flex flex-col max-h-[24rem] -my-6 w-full md:max-w-[36rem]"
+        className="flex flex-col max-h-[35rem] w-full md:min-w-[28rem] md:max-w-[36rem]"
         checkout
       />
       <form
-        className="flex flex-col h-[24rem] justify-between gap-y-9 px-6 w-full md:max-w-[32rem]"
+        className="flex flex-col h-[24rem] justify-between gap-y-9 px-6 w-full md:max-w-[32rem] md:mt-32"
         id="form"
         action={formAction}
       >
@@ -116,6 +122,6 @@ export default function Checkout({
       </form>
     </>
   ) : (
-    <p className="m-auto">В корзине ничего нет</p>
+    <p className="m-auto pt-32">В корзине ничего нет</p>
   );
 }

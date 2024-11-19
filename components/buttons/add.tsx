@@ -8,15 +8,16 @@ import Link from "next/link";
 function filterItem(item: Item) {
   const bagItem: { [key: string]: string | number | {} } = {
     id: item.id,
+    name: item.name || "",
     brand: { id: item.brand.id, name: item.brand.name },
     quantity: item.quantity,
     wms_id: item.wms_id,
     price: item.price,
     amount: item.amount!,
+    single: item.single || item.category.single || "",
   };
   if (item.collection)
     bagItem.collection = { id: item.collection.id, name: item.collection.name };
-  if (item.item_name) bagItem.name = item.item_name;
   return bagItem as unknown as Item;
 }
 

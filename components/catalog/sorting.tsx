@@ -15,7 +15,7 @@ export default function Sorting() {
   );
 
   return (
-    <>
+    <div className="relative ml-auto">
       <select
         onChange={(e) => {
           searchParams.order = e.target.value === "new" ? "" : e.target.value;
@@ -31,7 +31,7 @@ export default function Sorting() {
         <option value="desc">Сначала дороже</option>
         <option value="asc">Сначала дешевле</option>
       </select>
-      <ArrowIcon className="absolute top-[7.5rem] right-[1.825rem] text-white" />
-    </>
+      <ArrowIcon className="absolute top-1.5 right-1.5 text-white" />
+    </div>
   );
 }

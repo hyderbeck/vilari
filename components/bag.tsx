@@ -16,7 +16,11 @@ export default function Bag({
 }) {
   return (
     <section className={className}>
-      <div className="flex flex-col gap-y-6 p-6 pl-3 pb-0 overflow-y-scroll">
+      <div
+        className={`flex flex-col gap-y-6 p-6 overflow-y-scroll ${
+          checkout ? "pt-[7.5rem] gap-y-9" : ""
+        }`}
+      >
         {items.map((item) => (
           <Preview
             key={item.id}

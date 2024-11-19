@@ -18,13 +18,9 @@ export function useItems(bag: "order" | "pre") {
   return items;
 }
 
-/* 
-
 export function useMount() {
   const [mount, setMount] = useState(false);
 
-  useEffect(() => setMount(true));
+  useEffect(() => setMount(true), []);
   return mount;
 }
-
-*/

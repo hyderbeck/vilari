@@ -28,7 +28,7 @@ interface Color {
 
 export interface Item {
   id: number;
-  name: string;
+  name?: string;
   brand: Brand;
   collection?: Collection;
   designer?: { id: number; name: string };
@@ -40,13 +40,9 @@ export interface Item {
   weight?: number;
   wms_id: string;
   price: number;
-  item_name?: string;
   variants?: number[];
   quantity: number;
-  collab?: {
-    col: "brand" | "collection";
-    val: Brand | Collection;
-  };
+  single?: string;
 
   amount?: number;
 }

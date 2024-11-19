@@ -13,7 +13,7 @@ export function Edit({ id }: { id: number }) {
   return (
     <Link
       href={`cms?id=${id}`}
-      className="btn w-fit min-w-0 ml-auto -mt-[23px] absolute top-[9rem] left-[1.5rem]"
+      className="btn w-fit min-w-0 absolute top-0 right-[1.5rem]"
     >
       Ред.
     </Link>

@@ -1,4 +1,9 @@
 import Header from "@/components/header";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Vilari | Оформление заказа",
+};
 
 export default function CheckoutLayout({
   children,

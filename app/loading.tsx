@@ -3,7 +3,7 @@ import { Spinner } from "@/components/icons";
 
 export default function Loading() {
   return (
-    <Skeleton>
+    <Skeleton className="mt-32">
       <Spinner />
     </Skeleton>
   );

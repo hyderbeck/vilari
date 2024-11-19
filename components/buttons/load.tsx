@@ -22,7 +22,7 @@ export default function Load() {
       replace
       href={ref}
       scroll={false}
-      className="btn mx-auto"
+      className="btn mx-auto mt-12"
       onClick={() => {
         setLoading(true);
       }}

@@ -26,7 +26,7 @@ function FilterSet({
     setFilterSet(searchParams[filterType]);
   }, [searchParams, filterType]);
 
-  if (searchParams.category && searchParams.category !== "all") {
+  if (searchParams.category && !["all", "tableware", "teaware", "decor"].includes(searchParams.category)) {
     filters[filterType] = filters[filterType].filter((f) =>
       f.categories.includes(Number(searchParams.category))
     ) as any;
@@ -101,24 +101,43 @@ function FilterSet({
 
 export default function Filtering({ filters }: { filters: Filters }) {
   const params = useSearchParams();
+  const { replace } = useRouter();
   const searchParams: SearchParams = {};
   params.forEach(
     (value, key) => (searchParams[key as keyof SearchParams] = value)
   );
-  const [filterMenu, setFilterMenu] = useState(false);
+  const [filterMenu, setFilterMenu] = useState(
+    (searchParams.brands ||
+      searchParams.collections ||
+      searchParams.materials) ??
+      false
+  );
 
   return (
     <>
       <button
-        className="absolute top-[115px]"
+        className="-mt-[3.1rem] w-fit"
         onClick={() => setFilterMenu(!filterMenu)}
       >
         <FiltersIcon />
       </button>
+      {filterMenu && (
+        <button
+          onClick={() => {
+            searchParams.brands = undefined;
+            searchParams.collections = undefined;
+            searchParams.materials = undefined;
+            replace(buildRef(searchParams));
+          }}
+          className="underline underline-offset-4 w-fit"
+        >
+          Сбросить
+        </button>
+      )}
       <section
         className={`${
           filterMenu ? "flex" : "hidden"
-        } flex-col md:flex-row gap-x-24 gap-y-6 -mt-6`}
+        } flex-col md:flex-row gap-x-24 gap-y-6`}
       >
         <FilterSet
           filters={filters}

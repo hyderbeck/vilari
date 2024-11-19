@@ -30,22 +30,61 @@ export async function getItem(
   }
 }
 
+export async function getTaggedItems(
+  supabase: ReturnType<typeof createClient>,
+  tag: string
+) {
+  const { data } = await supabase
+    .from("items")
+    .select(`*, brand (*), collection (*), category (*)`)
+    .eq("tag", tag);
+  if (data?.length) {
+    return data;
+  }
+}
+
 export async function getItems(
   supabase: ReturnType<typeof createClient>,
   searchParams: SearchParams
 ) {
   let query = supabase
     .from("items")
-    .select(`*, brand (*), collection (*), category (*)`, { count: "exact" })
+    .select(`*, brand(*), collection(*), category!inner(*)`, {
+      count: "exact",
+    })
     .order("in_stock", { ascending: false })
-    .order(searchParams.order ? "price" : "name", {
+    .order(searchParams.order ? "price" : "full_name", {
       ascending: searchParams.order === "desc" ? false : true,
     });
-  if (searchParams.search)
-    query = query.ilike("name", `%${searchParams.search}%`);
-  if (searchParams.category && searchParams.category !== "all")
-    query = query.eq("category", searchParams.category);
-
+  if (searchParams.search) {
+    /*
+    const search = searchParams.search
+      .split(" ")
+      .map((word) => "'" + word + "'")
+      .join(" & ");
+    query = query.textSearch("full_name", `${search}`);
+    */
+    query = query.ilike("full_name", `%${searchParams.search}%`);
+  }
+  if (searchParams.category && searchParams.category !== "all") {
+    switch (searchParams.category) {
+      case "tableware":
+        query = query.eq("category.department", 1);
+        break;
+      case "teaware":
+        query = query.eq("category.department", 2);
+        break;
+      case "decor":
+        query = query.eq("category.department", 3);
+        break;
+      default:
+        const categories = searchParams.category.split(",");
+        query =
+          categories.length > 1
+            ? query.in("category", categories)
+            : query.eq("category", searchParams.category);
+    }
+  }
   if (searchParams.brands) {
     query = query.in("brand", searchParams.brands.split(","));
   }
@@ -117,7 +156,12 @@ export async function createOrder(
   bag: { id: string; quantity: number; price: number }[],
   description?: string
 ) {
+  const orders = (await fetchData("customerorder?order=created")).rows;
+  const lastOrder = orders[orders.length - 1].name as string;
+  const name =
+    String(Number(lastOrder.slice(0, lastOrder.length - 1)) + 1) + "C";
   return await fetchData("customerorder", {
+    name,
     organization: {
       meta: {
         href: `https://api.moysklad.ru/api/remap/1.2/entity/organization/${process.env.MOYSKLAD_ID}`,
@@ -146,13 +190,42 @@ export async function createOrder(
   });
 }
 
-export async function preorder(
-  supabase: ReturnType<typeof createClient>,
-  customer: string,
-  item: string,
-  description: string | null
+export async function createPreorder(
+  customerId: string,
+  bag: { id: string; quantity: number; price: number }[],
+  description?: string
 ) {
-  return await supabase
-    .from("preorders")
-    .insert({ customer, item, description });
+  const orders = (await fetchData("customerorder?order=created")).rows;
+  const lastOrder = orders[orders.length - 1].name as string;
+  const name =
+    String(Number(lastOrder.slice(0, lastOrder.length - 1)) + 1) + "C";
+
+  return await fetchData("customerorder", {
+    name,
+    organization: {
+      meta: {
+        href: `https://api.moysklad.ru/api/remap/1.2/entity/organization/${process.env.MOYSKLAD_ID}`,
+        type: "organization",
+      },
+    },
+    agent: {
+      meta: {
+        href: `https://api.moysklad.ru/api/remap/1.2/entity/counterparty/${customerId}`,
+        type: "counterparty",
+      },
+    },
+    positions: bag.map(({ id, quantity, price }) => {
+      return {
+        assortment: {
+          meta: {
+            href: `https://api.moysklad.ru/api/remap/1.2/entity/product/${id}`,
+            type: "product",
+          },
+        },
+        quantity,
+        price,
+      };
+    }),
+    description,
+  });
 }

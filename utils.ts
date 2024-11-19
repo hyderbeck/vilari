@@ -1,4 +1,4 @@
-import { SearchParams } from "./interfaces";
+import { Item, SearchParams } from "./interfaces";
 
 export function buildRef(searchParams: SearchParams) {
   let ref = "/";
@@ -27,3 +27,16 @@ export function buildRef(searchParams: SearchParams) {
 export function fmtPrice(price: number) {
   return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " ₽";
 }
+
+export function formatName(item: Item) {
+  return (
+    (item.single || item.category?.single) /* localStorage */ +
+    (item.name ? " " + item.name.toUpperCase() : "")
+  );
+}
+
+export const departments = [
+  { id: 1, name: "Столовые предметы", param: "tableware" },
+  { id: 2, name: "Чайные предметы", param: "teaware" },
+  { id: 3, name: "Декор", param: "decor" },
+];

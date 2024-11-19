@@ -4,7 +4,9 @@ import "./globals.css";
 import Footer from "@/components/footer";
 
 export const metadata: Metadata = {
-  title: "Vilari",
+  metadataBase: new URL("https://vilari.vercel.com"),
+  title:
+    "Vilari | " + "Посуда и декор от Seletti, Bitossi, ИФЗ и других брендов",
   description: "Посуда и декор от Seletti, Bitossi, ИФЗ и других брендов",
 };
 
