@@ -1,11 +1,12 @@
 "use client";
 
 import { Category } from "@/interfaces";
-import { NavIcon } from "../icons";
+import { Nav as NavIcon } from "../icons";
 import Link from "next/link";
-// import Image from "next/image";
+import Image from "next/image";
 import { useState } from "react";
-import { buildRef } from "@/utils";
+import { formatRef } from "@/app/utils";
+import { departments } from "@/app/constants";
 
 export default function Nav({
   categories,
@@ -16,12 +17,6 @@ export default function Nav({
   nav: boolean;
   onClick: () => void;
 }) {
-  const departments = [
-    { id: 1, name: "Столовые предметы" },
-    { id: 2, name: "Чайные предметы" },
-    { id: 3, name: "Декор" },
-  ];
-
   const [department, setDepartment] = useState(0);
 
   let itemTypes: Category[] = [];
@@ -43,7 +38,7 @@ export default function Nav({
         }}
         aria-label="nav"
       >
-        <NavIcon />
+        <NavIcon className="size-6" />
       </button>
       <nav className="hidden md:flex gap-x-6 absolute top-9 left-[12.5rem]">
         {departments.map((departm) => (
@@ -59,53 +54,30 @@ export default function Nav({
         ))}
         <section
           className={`${
-            nav ? "grid" : "hidden"
-          } grid grid-cols-3 fixed top-16 mt-6 p-6 right-0 left-0 bg-white border-t border-b`}
+            nav && itemTypes.length ? "flex" : "hidden"
+          } flex-col gap-y-3 fixed top-16 mt-6 p-6 right-0 left-0 bg-white border-t border-b`}
         >
-          {itemTypes
-            .sort((a, b) => a.name.localeCompare(b.name))
-            .map((itemType) => {
-              const ref = buildRef({
-                category: String(itemType.id),
-              });
-              return (
-                <Link
-                  key={itemType.id}
-                  replace
-                  href={ref}
-                  className="w-fit"
-                  onClick={onClick}
-                >
-                  {itemType.name}
-                </Link>
-              );
-            })}
-        </section>
-      </nav>
-      <nav
-        className={`${
-          nav ? "flex md:hidden" : "hidden"
-        } flex-col items-center fixed top-16 mt-6 py-6 right-0 bottom-0 left-0 bg-white border-t`}
-      >
-        {department ? (
-          <button onClick={() => setDepartment(0)} className="text-base mb-3">
-            {"<<"}
-          </button>
-        ) : (
-          <Link
-            replace
-            href="/?category=all"
-            className="text-base mb-3"
-            onClick={onClick}
-          >
-            Всё
-          </Link>
-        )}
-        {department
-          ? itemTypes
-              .sort((a, b) => a.name.localeCompare(b.name))
+          {!!department && (
+            <Link
+              key={departments.find((d) => department === d.id)!.param}
+              replace
+              href={formatRef({
+                category: departments.find((d) => department === d.id)!.param,
+              })}
+              className="w-fit underline underline-offset-4"
+              onClick={onClick}
+            >
+              Всё
+            </Link>
+          )}
+          <div className={`grid grid-rows-5 grid-flow-col`}>
+            {itemTypes
+              .sort((a, b) => {
+                if (b.name === "Разное") return -1;
+                return a.name.localeCompare(b.name);
+              })
               .map((itemType) => {
-                const ref = buildRef({
+                const ref = formatRef({
                   category: String(itemType.id),
                 });
                 return (
@@ -113,33 +85,95 @@ export default function Nav({
                     key={itemType.id}
                     replace
                     href={ref}
-                    className="text-base md:text-sm"
+                    className="w-fit"
                     onClick={onClick}
                   >
                     {itemType.name}
                   </Link>
                 );
-              })
-          : departments.map((department) => (
-              <button
-                key={department.id}
-                className="text-base md:text-sm"
-                onClick={() => setDepartment(department.id)}
-              >
-                {department.name}
-              </button>
-            ))}
+              })}
+          </div>
+        </section>
       </nav>
+      <div
+        className={`${
+          nav ? "flex md:hidden" : "hidden"
+        } flex-col items-center gap-y-12 fixed top-16 mt-6 py-6 right-0 bottom-0 left-0 bg-white border-t overflow-scroll`}
+      >
+        <nav className="flex flex-col items-center text-base">
+          {department ? (
+            <button onClick={() => setDepartment(0)} className="mb-3">
+              {"<<"}
+            </button>
+          ) : (
+            <Link
+              replace
+              href="/?category=all"
+              className="mb-3 underline underline-offset-4"
+              onClick={onClick}
+            >
+              Всё
+            </Link>
+          )}
+          {!!department && (
+            <Link
+              key={departments.find((d) => department === d.id)!.param}
+              replace
+              href={formatRef({
+                category: departments.find((d) => department === d.id)!.param,
+              })}
+              className={`w-fit ${
+                department === 2 ? "" : "mb-3"
+              } underline underline-offset-4`}
+              onClick={onClick}
+            >
+              Всё
+            </Link>
+          )}
+          {department === 2 && (
+            <Link
+              key="multiple"
+              replace
+              href={formatRef({
+                category: "6,7,11",
+              })}
+              className="w-fit mb-3"
+              onClick={onClick}
+            >
+              Кружки и чашки
+            </Link>
+          )}
+          {department
+            ? itemTypes
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .map((itemType) => {
+                  const ref = formatRef({
+                    category: String(itemType.id),
+                  });
+                  return (
+                    <Link
+                      key={itemType.id}
+                      replace
+                      href={ref}
+                      className="md:text-sm"
+                      onClick={onClick}
+                    >
+                      {itemType.name}
+                    </Link>
+                  );
+                })
+            : departments.map((department) => (
+                <button
+                  key={department.id}
+                  className="md:text-sm"
+                  onClick={() => setDepartment(department.id)}
+                >
+                  {department.name}
+                </button>
+              ))}
+        </nav>
+        <Image alt="vilari" src="/logo.png" width={160} height={200} />
+      </div>
     </>
   );
 }
-
-/*
-        <Image
-          alt="vilari"
-          src="/logo.png"
-          width={160}
-          height={200}
-          className="mt-auto xs:hidden md:block w-auto h-auto"
-        />
-*/

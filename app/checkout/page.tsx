@@ -1,13 +1,12 @@
 import { Main } from "@/components/skeleton";
 import Checkout from "./checkout";
-import { Item } from "@/interfaces";
-import { createOrder, getCustomer, preorder } from "@/queries";
-import { createClient } from "@/supabase";
+import { OrderItem } from "@/interfaces";
+import { createOrder, getCustomer } from "@/queries";
 
 async function placeOrder(_prevState: undefined | true, formData: FormData) {
   "use server";
 
-  const bag = JSON.parse(formData.get("bag") as string) as Item[];
+  const bag = JSON.parse(formData.get("bag") as string) as OrderItem[];
   const description = ((formData.get("description") as string) || "").trim();
 
   const customer = {
@@ -31,26 +30,17 @@ async function placeOrder(_prevState: undefined | true, formData: FormData) {
 
   const customerId = await getCustomer(customer.name, customer.phone);
 
-  if (formData.get("orderType") === "pre") {
-    await preorder(
-      createClient(),
-      customerId,
-      bag[0].wms_id,
-      description || null
-    );
-  } else {
-    await createOrder(
-      customerId,
-      customer.bag.map((item) => {
-        return {
-          id: item.wms_id,
-          quantity: item.amount || 0,
-          price: item.price * 100,
-        };
-      }),
-      customer.description
-    );
-  }
+  await createOrder(
+    customerId,
+    customer.bag.map((item) => {
+      return {
+        id: item.wms_id,
+        quantity: item.amount || 0,
+        price: item.price * 100,
+      };
+    }),
+    customer.description
+  );
 
   return true;
 }
@@ -61,7 +51,7 @@ export default async function Page({
   searchParams: { pre?: true };
 }) {
   return (
-    <Main className="flex flex-col md:flex-row gap-y-12 justify-center items-center md:items-start">
+    <Main className="flex-1 flex flex-col md:flex-row gap-y-12 justify-center items-center md:items-start">
       <Checkout placeOrderAction={placeOrder} pre={searchParams.pre} />
     </Main>
   );

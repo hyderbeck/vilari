@@ -1,5 +1,5 @@
-import { IGIcon, WAIcon } from "./icons";
-import { atteron } from "../app/fonts";
+import { IG as IGIcon, WA as WAIcon } from "./icons";
+import { atteron } from "@/app/fonts";
 
 export default function Footer() {
   return (
@@ -14,19 +14,18 @@ export default function Footer() {
               <WAIcon />
             </a>
           </div>
-          <a
-            href="tel:+79933451128"
-            className="text-base underline underline-offset-4 w-fit"
-          >
+
+          <a href="tel:+79933451128" className="text-base underlined w-fit">
             +7 (993) 345 11 28
           </a>
+
           <div>
             367008
             <br />
             <a
               href="http://maps.google.com/?q=Ulitsa Batyrmurzayeva, 85, Makhachkala, Republic of Dagestan, Russia, 367008"
               target="_blank"
-              className="underline underline-offset-4"
+              className="underlined"
             >
               Батырмурзаева 85
             </a>

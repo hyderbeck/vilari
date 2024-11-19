@@ -1,88 +1,90 @@
 "use client";
 
-import { useItems } from "@/app/hooks";
-import { Item } from "@/interfaces";
-import { PlusIcon, MinusIcon } from "../icons";
+import { useBag } from "@/app/hooks";
+import { OrderItem, Item, Page, Order } from "@/interfaces";
+import { Plus as PlusIcon, Minus as MinusIcon } from "../icons";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
-function filterItem(item: Item) {
-  const bagItem: { [key: string]: string | number | {} } = {
+function setBag(orderType: Order, items: OrderItem[]) {
+  localStorage.setItem(orderType, JSON.stringify(items));
+  window.dispatchEvent(new Event(orderType));
+}
+
+function formatItem(item: Item) {
+  const orderItem: OrderItem = {
     id: item.id,
+    name: item.name,
     brand: { id: item.brand.id, name: item.brand.name },
     quantity: item.quantity,
     wms_id: item.wms_id,
     price: item.price,
-    amount: item.amount!,
+    amount: 1,
+    single: (item.single || item.category.single)!,
   };
   if (item.collection)
-    bagItem.collection = { id: item.collection.id, name: item.collection.name };
-  if (item.item_name) bagItem.name = item.item_name;
-  return bagItem as unknown as Item;
+    orderItem.collection = {
+      id: item.collection.id,
+      name: item.collection.name,
+    };
+
+  return orderItem;
 }
 
-function handleOrder(item: Item, items: Item[], i: number, add = true) {
-  const isAdded = i >= 0;
-  if (add) {
-    if (!isAdded) {
-      items.push(filterItem(item));
-      i = items.findIndex(({ id }) => id === item.id);
-      items[i].amount = 0;
-    }
-    items[i].amount!++;
+function handleBag(bag: OrderItem[], i: number, item?: Item | OrderItem) {
+  if (item) {
+    i < 0 ? bag.push(formatItem(item as Item)) : bag[i].amount++;
   } else {
-    items[i].amount!--;
-    !items[i].amount && items.splice(i, 1);
+    bag[i].amount--;
+    !bag[i].amount && bag.splice(i, 1);
   }
-  localStorage.setItem("order", JSON.stringify(items));
-  window.dispatchEvent(new Event("order"));
-}
 
-function handlePre(item: Item) {
-  item.amount = 1;
-  localStorage.setItem("pre", JSON.stringify([filterItem(item)]));
-  window.dispatchEvent(new Event("pre"));
+  setBag("order", bag);
 }
 
 export default function Add({
   item,
   page,
 }: {
-  item: Item;
-  page?: "home" | "checkout" | "item";
+  item: Item | OrderItem;
+  page?: Page;
 }) {
-  const items = useItems("order");
-  const i = items.findIndex(({ id }) => id === item.id);
-  const amount = i >= 0 ? items[i].amount : 0;
+  const { replace } = useRouter();
+  const bag = useBag("order");
+  const i = bag.findIndex(({ id }) => id === item.id);
+  const amount = i >= 0 ? bag[i].amount : 0;
+  const isMore = item.quantity - amount > 0;
+
+  const preBtnClassName = "btn bg-white text-black border border-black";
 
   return amount ? (
-    <section className="btn">
-      <button onClick={() => handleOrder(item, items, i, false)}>
-        <MinusIcon />
+    <article className="btn">
+      <button onClick={() => handleBag(bag, i)}>
+        <MinusIcon className="size-4" />
       </button>
       <p>{amount}x</p>
       <button
-        onClick={() => handleOrder(item, items, i)}
-        disabled={!item.quantity || item.quantity - amount <= 0}
-        className={
-          !item.quantity || item.quantity - amount <= 0 ? "text-black" : ""
-        }
+        onClick={() => handleBag(bag, i, item)}
+        disabled={!isMore}
+        className={isMore ? "text-black" : ""}
       >
-        <PlusIcon />
+        <PlusIcon className="size-4" />
       </button>
-    </section>
+    </article>
   ) : item.quantity ? (
-    <button onClick={() => handleOrder(item, items, i)} className="btn w-full">
+    <button onClick={() => handleBag(bag, i, item)} className="btn w-full">
       В корзину
     </button>
-  ) : page === "checkout" ? (
-    <div className="btn bg-white border border-black text-black">Предзаказ</div>
   ) : (
-    <Link
-      href="/checkout?pre=true"
-      onClick={() => handlePre(item)}
-      className="btn bg-white border border-black text-black"
+    <button
+      disabled={page === "checkout"}
+      onClick={() => {
+        setBag("pre", [formatItem(item as Item)]);
+        replace("/checkout?pre=true");
+      }}
+      className={preBtnClassName}
     >
       Предзаказ
-    </Link>
+    </button>
   );
 }

@@ -1,4 +1,7 @@
 import Header from "@/components/header";
+import Menu from "@/components/menu";
+import { getCategories } from "@/queries";
+import { createClient } from "@/supabase";
 
 export default async function HomeLayout({
   children,
@@ -7,7 +10,9 @@ export default async function HomeLayout({
 }>) {
   return (
     <>
-      <Header layout="home" />
+      <Header className="fixed top-0 right-0 left-0 z-10">
+        <Menu categories={await getCategories(createClient())} />
+      </Header>
       {children}
     </>
   );

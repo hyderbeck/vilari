@@ -1,20 +1,17 @@
 import Link from "next/link";
-import { PlusIcon } from "../icons";
+import { Plus as PlusIcon } from "../icons";
 
-export function Create() {
+export function Create({ className }: { className: string }) {
   return (
-    <Link href="cms" className="btn w-fit min-w-0 ml-auto -mt-[23px]">
-      <PlusIcon />
+    <Link replace href="cms" className={`btn ${className}`}>
+      <PlusIcon className="size-4" />
     </Link>
   );
 }
 
-export function Edit({ id }: { id: number }) {
+export function Edit({ id, className }: { id: number; className: string }) {
   return (
-    <Link
-      href={`cms?id=${id}`}
-      className="btn w-fit min-w-0 ml-auto -mt-[23px] absolute top-[9rem] left-[1.5rem]"
-    >
+    <Link replace href={`cms?id=${id}`} className={`btn ${className}`}>
       Ред.
     </Link>
   );

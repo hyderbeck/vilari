@@ -1,30 +1,28 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Item } from "@/interfaces";
+import { Order, OrderItem, SearchParams } from "@/interfaces";
+import { useSearchParams as useSParams } from "next/navigation";
 
-function getBag(bag: "order" | "pre") {
-  return JSON.parse(localStorage.getItem(bag) || "[]") as Item[];
+function getBag(orderType: Order) {
+  return JSON.parse(localStorage.getItem(orderType) ?? "[]") as OrderItem[];
 }
 
-export function useItems(bag: "order" | "pre") {
-  const [items, setItems] = useState([] as Item[]);
+export function useBag(orderType: Order) {
+  const [items, setItems] = useState([] as OrderItem[]);
 
   useEffect(() => {
-    setItems(getBag(bag));
-    window.addEventListener(bag, () => setItems(getBag(bag)));
-  }, [bag]);
+    setItems(getBag(orderType));
+    window.addEventListener(orderType, () => setItems(getBag(orderType)));
+  }, [orderType]);
 
   return items;
 }
 
-/* 
-
-export function useMount() {
-  const [mount, setMount] = useState(false);
-
-  useEffect(() => setMount(true));
-  return mount;
+export function useSearchParams() {
+  const params: SearchParams = {};
+  useSParams().forEach(
+    (value, key) => (params[key as keyof SearchParams] = value)
+  );
+  return params;
 }
-
-*/

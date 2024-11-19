@@ -1,26 +1,24 @@
-import { atteron } from "../app/fonts";
+import { atteron } from "@/app/fonts";
 import Link from "next/link";
-import Menu from "./menu";
-import { createClient } from "@/supabase";
-import { getCategories } from "@/queries";
+import { ReactNode } from "react";
 
 export default async function Header({
-  layout,
+  className,
+  children,
 }: {
-  layout?: "home" | "checkout";
+  className: string;
+  children?: ReactNode;
 }) {
   return (
     <header
-      className={`fixed top-0 right-0 left-0 flex justify-between items-center bg-white p-6 border-b z-10`}
+      className={`flex justify-between items-center bg-white p-6 border-b ${className}`}
     >
       <h1 className={`${atteron.className} text-4xl tracking-widest`}>
-        <Link scroll={false} href="/">
+        <Link replace scroll={false} href="/">
           vilari
         </Link>
       </h1>
-      {layout === "home" && (
-        <Menu categories={await getCategories(createClient())} />
-      )}
+      {children}
     </header>
   );
 }

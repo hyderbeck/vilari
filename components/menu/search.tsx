@@ -1,42 +1,48 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
-import { SearchIcon } from "../icons";
-import { buildRef } from "@/utils";
+import { Search as SearchIcon } from "../icons";
+import { formatRef } from "@/app/utils";
 
 export default function Search({
   search,
   onClick,
+  className,
 }: {
   search: boolean;
   onClick: () => void;
+  className: { btn: string; search: string };
 }) {
-  const searchParams = useSearchParams();
   const { replace } = useRouter();
+
   return (
     <>
-      <button className="z-10" onClick={onClick} aria-label="search">
-        <SearchIcon />
+      <button onClick={onClick} aria-label="search" className={className.btn}>
+        <SearchIcon className="size-6" />
       </button>
+
       <div
-        className={`absolute top-16 mt-6 right-0 left-0 ${
+        className={`${
           search ? "flex" : "hidden"
-        } justify-center items-center gap-x-3 p-6 bg-white border-t border-b`}
+        } justify-center items-center gap-x-3 p-6 bg-white border-t border-b ${
+          className.search
+        }`}
       >
-        <SearchIcon />
+        <SearchIcon className="size-6" />
         <input
           type="search"
           name="search"
           aria-label="search"
           onChange={(e) => {
             const search = e.target.value.trim();
-            const ref = buildRef({
-              search,
-              category: !search ? "all" : "",
-            });
-            replace(ref);
+            replace(
+              formatRef({
+                search,
+                category: search ? undefined : "all",
+              })
+            );
           }}
-          defaultValue={searchParams.get("search")?.toString()}
+          defaultValue={useSearchParams().get("search") ?? undefined}
           autoCorrect="false"
           spellCheck="false"
           className="flex-1 text-base bg-inherit rounded-none outline-none"
