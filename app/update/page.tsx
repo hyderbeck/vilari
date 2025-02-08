@@ -23,6 +23,10 @@ async function updateQuantities(supabase: ReturnType<typeof createAdmin>) {
 
   for (const item of data! as Item[]) {
     const quantity = await getQuantity(item.wms_id);
+    if (!quantity && quantity !== 0) {
+      console.log(item.wms_id)
+      continue
+    }
     await supabase
       .from("items")
       .update({ quantity, in_stock: !!quantity })
@@ -62,6 +66,10 @@ async function updatePrices(supabase: ReturnType<typeof createAdmin>) {
 
   for (const item of data! as Item[]) {
     const price = await getPrice(item.wms_id);
+    if (!price) {
+      console.log(item.wms_id)
+      continue
+    }
     await supabase.from("items").update({ price }).eq("id", item.id);
   }
 }

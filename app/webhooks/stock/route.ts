@@ -1,18 +1,5 @@
 import { fetchData } from "@/queries";
-import { createClient } from "@supabase/supabase-js";
-
-function createAdmin() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-      },
-    }
-  );
-}
+import { createAdmin } from "../supabase";
 
 async function updateQuantities(
   supabase: ReturnType<typeof createAdmin>,
@@ -35,7 +22,12 @@ export async function POST(request: Request) {
     false
   )) as { assortmentId: string; stock: number }[];
 
-  await updateQuantities(createAdmin(), items);
+  try {
+    await updateQuantities(createAdmin(), items);
+  } catch (e) {
+    console.error(items)
+    console.error(e)
+  }
 
   return new Response(null, { status: 200 });
 }

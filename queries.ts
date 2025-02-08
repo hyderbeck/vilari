@@ -6,7 +6,7 @@ import {
   Collection,
   Material,
 } from "./interfaces";
-import { createClient } from "./supabase";
+import { createClient } from "./supabase/server";
 
 export async function getItem(
   supabase: ReturnType<typeof createClient>,
@@ -115,22 +115,31 @@ export async function fetchData(endpoint: string, body?: {}, entity = true) {
     "Basic " + Buffer.from(process.env.MOYSKLAD_CREDS!).toString("base64");
   return await (
     await fetch(
-      `https://api.moysklad.ru/api/remap/1.2/${
-        entity ? `entity/${endpoint}` : endpoint
+      `https://api.moysklad.ru/api/remap/1.2/${entity ? `entity/${endpoint}` : endpoint
       }`,
       {
         method: body ? "POST" : "GET",
         headers: body
           ? {
-              Authorization: auth,
-              "Accept-Encoding": "gzip",
-              "Content-Type": "application/json",
-            }
+            Authorization: auth,
+            "Accept-Encoding": "gzip",
+            "Content-Type": "application/json",
+          }
           : { Authorization: auth },
         body: JSON.stringify(body),
       }
     )
   ).json();
+}
+export async function getImageHref(downloadHref: string) {
+  const auth =
+    "Basic " + Buffer.from(process.env.MOYSKLAD_CREDS!).toString("base64");
+  return await (await fetch(downloadHref,
+    {
+      method: "GET",
+      headers: { Authorization: auth },
+    }
+  )).blob()
 }
 export async function getCustomer(name: string, phone: string) {
   let customer = (
@@ -144,13 +153,12 @@ export async function getCustomer(name: string, phone: string) {
 }
 export async function getQuantity(id: string) {
   if (!id) return 0;
-  return (await fetchData(`assortment?filter=id=${id}`)).rows[0].quantity;
+  const temp = (await fetchData(`assortment?filter=id=${id}`)).rows[0]
+  if (temp) return temp.quantity as number;
 }
 export async function getPrice(id: string) {
-  return (
-    (await fetchData(`assortment?filter=id=${id}`)).rows[0].salePrices[0]
-      .value / 100
-  );
+  const temp = (await fetchData(`assortment?filter=id=${id}`)).rows[0]
+  if (temp) return temp.salePrices[0].value / 100;
 }
 export async function createOrder(
   customerId: string,
@@ -160,7 +168,7 @@ export async function createOrder(
   const orders = (await fetchData("customerorder?order=created")).rows;
   const lastOrder = orders[orders.length - 1].name as string;
   const name =
-    String(Number(lastOrder.slice(0, lastOrder.length - 1)) + 1) + "C";
+    String(Number(lastOrder.slice(0, lastOrder.length - 1)) + 1) + "S";
   return await fetchData("customerorder", {
     name,
     organization: {
