@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import Home from "./home";
 import { SearchParams } from "@/interfaces";
 import { Main } from "@/components/skeleton";
-import { createClient } from "@/supabase";
+import { createClient } from "@/supabase/server";
 import { Metadata } from "next";
 import { departments, title } from "@/app/constants";
 

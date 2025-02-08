@@ -1,6 +1,6 @@
 import Preview from "@/components/preview";
 import { getItem } from "@/queries";
-import { createClient } from "@/supabase";
+import { createClient } from "@/supabase/server";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 

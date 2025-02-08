@@ -1,7 +1,7 @@
 import Header from "@/components/header";
 import Menu from "@/components/menu";
 import { getCategories } from "@/queries";
-import { createClient } from "@/supabase";
+import { createClient } from "@/supabase/server";
 
 export default async function HomeLayout({
   children,

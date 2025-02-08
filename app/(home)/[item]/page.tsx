@@ -4,7 +4,7 @@ import { Spinner } from "@/components/icons";
 import { Main } from "@/components/skeleton";
 import { SearchParams } from "@/interfaces";
 import { getItem } from "@/queries";
-import { createClient } from "@/supabase";
+import { createClient } from "@/supabase/server";
 import { formatName } from "@/app/utils";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";

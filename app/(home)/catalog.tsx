@@ -1,7 +1,7 @@
 import { getFilters, getItems } from "@/queries";
 import Load from "@/components/buttons/load";
 import Preview from "@/components/preview";
-import { createClient } from "@/supabase";
+import { createClient } from "@/supabase/server";
 import Sorting from "@/components/catalog/sorting";
 import { SearchParams } from "@/interfaces";
 import Filters from "@/components/catalog/filters";

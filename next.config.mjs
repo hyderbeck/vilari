@@ -7,6 +7,7 @@ const nextConfig = {
         hostname: "rzpcucgkjsqqedurowkl.supabase.co",
       },
     ],
+    unoptimized: true
   },
   async redirects() {
     return [
