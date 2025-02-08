@@ -1,5 +1,5 @@
 import { Items, Logos } from "@/components/home/carousels";
-import { createClient } from "@/supabase";
+import { createClient } from "@/supabase/server";
 
 async function getTaggedItems(
   supabase: ReturnType<typeof createClient>,
